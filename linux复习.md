@@ -658,3 +658,7 @@
 8. 进入GitHub，新建一个仓库。![alt text](.assets_IMG/linux复习/image-100.png)。输入好name以后直接点击Create repository。创建一个新的仓库。
 9. ![alt text](.assets_IMG/linux复习/image-101.png)。按照顺序，以此在终端复制进这三条指令。![alt text](.assets_IMG/linux复习/image-102.png)显示同步成功
 10. 打开Github，刷新，![alt text](.assets_IMG/linux复习/image-103.png)，我们发现文件已经顺利上传至Github云端。
+11. 说明：密钥的配对是一次性操作，一个系统只需要配对一次，但是配置用户和Github用户是需要每次启动系统都配置的，否则系统无法与云端建立联系，就无法将文件上云。
+## windows系统利用vscode从Github云同步在Ubuntu系统中上云的文件，实现windows系统和Ubuntu系统的数据同步
+1. 在桌面打开Git Bash终端。先配置电脑用户和Github用户，![alt text](.assets_IMG/linux复习/image-104.png)。
+2. 打开一个想要同步文件的仓库，复制该仓库的Url。![alt text](.assets_IMG/linux复习/image-105.png)。在终端输入git clone <复制的Url>。回车，即可在桌面得到仓库中的所有文件。
