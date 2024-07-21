@@ -646,5 +646,5 @@
     + $:vim/etc/hosts
 ## SSH
 + ssh 远程linux的ip或者映射域名
-## 免密登陆
-   
+## windows系统使用git教程的一些说明
+1. 安装
