@@ -13,9 +13,9 @@
     1. Linux一切皆文件（众生平等）
     2. 只有一个顶级目录，不像windows分C盘、D盘、E盘。
 + 目录结构
-    ![alt text](image-69.png)
+    ![alt text](./.assets_IMG/linux复习/-69.png)
 + 文件含义
-        ![alt text](image-70.png)
+        ![alt text](./.assets_IMG/了inux复习/image-70.png)
 ## Linux文件管理命令
 ***注意事项***：命令区分大小写
 1. 命令的格式固定为：命令 [-选项] [参数]   （中间有空格）
@@ -30,7 +30,7 @@
     + 查看详细信息，元数据信息（用户、组、大小、创建时间、权限信息、文件类型）
     + 查看隐藏文件：ls -a
     + 参数并用：ls -la
-    + 当使用ls -l会显示文件的详细信息，包含权限信息：![alt text](image-71.png)
+    + 当使用ls -l会显示文件的详细信息，包含权限信息：![alt text](./.assets_IMG/linux复习/image-71.png)
 3. 切换工作目录：cd命令
     + cd 目标文件夹：    
         命令所在路径：shell内置
@@ -51,7 +51,7 @@
 
         功能描述：显示当前目录
 
-        示范：![alt text](image-72.png)
+        示范：![alt text](./.assets_IMG/linux复习/image-72.png)
     + 特殊目录符号：
 
         ~ 当前用户的home目录
@@ -62,7 +62,7 @@
     + 执行权限：所有用户
     + 语法：mkdir -p 递归创建
     
-    示范：![alt text](image-73.png)
+    示范：![alt text](./.assets_IMG/linux复习/image-73.png)
     + 在当前位置新建文件夹：mkdir 文件夹名
     + 在指定目录位置创建文件夹，并创建父文件夹：mkdir -p /a/b/文件夹名
     + 在当前目录下新建文件：touch 文件名
@@ -153,7 +153,7 @@
     + 以分页的方式浏览文件信息（适合查看大文档），进入浏览模式
     + 浏览模式快捷键：
     
-        ![alt text](image-74.png)
+        ![alt text](./.assets_IMG/linux复习/image-74.png)
         
         G：最后一页
         g：第一页
@@ -210,7 +210,7 @@
 
     -iname不区分大小写
 
-    ![alt text](image-75.png)
+    ![alt text](./.assets_IMG/linux复习/image-75.png)
 2. 文件资料库查找：locate命令
     + 命令所在路径：/eser/bin/locate
     + 执行用户：所有用户
@@ -275,7 +275,7 @@
             创建文件/etc/issue的硬链接/tmp/issue.hard
     + 模型图：
 
-        ![alt text](image-76.png)
+        ![alt text](./.assets_IMG/linux复习/image-76.png)
     + 说明：
             
             文件名：该文件的名字
@@ -294,12 +294,12 @@
         3. 不能跨分区
         4. 不能针对目录使用
 
-        ![alt text](image-77.png)
+        ![alt text](./.assets_IMG/linux复习/image-77.png)
         5. 命令：ln -s 目标文件或文件夹 软链接名字
 ## 权限管理
 1. 用户组（如图所示）
 
-![alt text](image-78.png)
+![alt text](./.assets_IMG/linux复习/image-78.png)
 + 相关命令
 
         1. 创建组：groupadd 组名
@@ -321,8 +321,8 @@
 3. 权限管理命令
 + 问题：linux系统未来可能有程序员、用户、数据库管理员、项目经理等各种角色各种级别人使用，甚至还有身份不明的人链接到linux，控制不好权限容易导致系统崩溃、数据丢失等问题。
 + 权限含义：
-![alt text](image-79.png)
-+ 权限访问控制列表（ACL access controll list）![alt text](image-80.png)
+![alt text](./.assets_IMG/linux复习/image-79.png)
++ 权限访问控制列表（ACL access controll list）![alt text](./.assets_IMG/linux复习/image-80.png)
 #### 修改文件权限：chmod命令
 + 命令所在路径：/bin/chmod
 + 执行权限：所有用户
@@ -343,16 +343,16 @@
      $:chmod -R 777 testdir
 + 权限设置1
 
-    ![alt text](image-81.png)
+    ![alt text](./.assets_IMG/linux复习/image-81.png)
 + 权限设置2
 
-    ![alt text](image-82.png)
+    ![alt text](./.assets_IMG/linux复习/image-82.png)
 #### 修改文件所有者：chown命令
-![alt text](image-83.png)
+![alt text](./.assets_IMG/linux复习/image-83.png)
 #### 修改文件所属组：chgrp命令
-![alt text](image-84.png)
+![alt text](./.assets_IMG/linux复习/image-84.png)
 #### 默认权限：umask命令
-![alt text](image-85.png)
+![alt text](./.assets_IMG/linux复习/image-85.png)
 #### 查看权限：ll命令
 + ls -la 文件
 + ll 文件 
@@ -397,9 +397,9 @@
         
         $passwd huangjingbo
 2. 查看登陆用户：who命令
-+ ![alt text](image-86.png)
++ ![alt text](./.assets_IMG/linux复习/image-86.png)
 3. w命令
-+ ![alt text](image-87.png)
++ ![alt text](./.assets_IMG/linux复习/image-87.png)
 4. 修改密码：passwd命令
 + 命令所在路径：/usr/bin/passwd 
 + 执行权限：所有用户
@@ -408,7 +408,7 @@
 + 范例：
     $ passwd huangjingbo
 5. 切换用户：su命令
-    ![alt text](image-88.png)
+    ![alt text](./.assets_IMG/linux复习/image-88.png)
 ## 压缩解压所命令
 1. 压缩：gzip命令
     + 命令所在路径：/bin/gzip 
@@ -609,7 +609,7 @@
 
     top!
         
-    ![alt text](image-90.png)
+    ![alt text](./.assets_IMG/linux复习/image-90.png)
 + 关闭进程
 
     kill 进程id
@@ -632,13 +632,13 @@
 
         date >> date.log
 ## Linux服务
-![alt text](image-91.png)
+![alt text](./.assets_IMG/linux复习/image-91.png)
 ## ip设置
-![alt text](image-92.png)
+![alt text](./.assets_IMG/linux复习/image-92.png)
 ## 防火墙
-![alt text](image-93.png)
+![alt text](./.assets_IMG/linux复习/image-93.png)
 ## 主机名
-![alt text](image-94.png)
+![alt text](./.assets_IMG/linux复习/image-94.png)
 ## ip映射
 + 域名解析
 + 本地hosts

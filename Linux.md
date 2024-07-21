@@ -1,24 +1,24 @@
 ## linux的目录结构
-![目录结构示意图](image-1.png)
-![一切皆文件](image-2.png)
+![目录结构示意图](./.assets_IMG/Linux/image-1.png)
+![一切皆文件](./.assets_IMG/Linux/image-2.png)
 ## linux常见的帮助命令
 1. man获取帮助信息（简单记为有问题找那个男人）
-   ![alt text](image-3.png)
+   ![alt text](./.assets_IMG/Linux/image-3.png)
 + ls：查询当前目录表
-![ls](image-4.png)
-+ man ls：![man ls](image-5.png)
+![ls](./.assets_IMG/Linux/image-4.png)
++ man ls：![man ls](./.assets_IMG/Linux/image-5.png)
 2. help
 + 只能显示shell内置的命令
 ## 开关机命令
-1. 基本语法：![alt text](image-6.png)
-2. 选项：![alt text](image-7.png)
+1. 基本语法：![alt text](./.assets_IMG/Linux/image-6.png)
+2. 选项：![alt text](./.assets_IMG/Linux/image-7.png)
 ## 文件目录类命令
 1. pwd：显示当前工作目录的局对路径（从根目录开始写起）
 2. ls -a:显示当前目录的隐藏文件
 3. cd：进入某一文件夹
-4. ls -l：显示完整信息（long）![alt text](image-8.png)前面是文件类型及权限  第二列是连接数  第三为作者  第四列为大小（bate）  时间   文件（夹）名字
+4. ls -l：显示完整信息（long）![alt text](./.assets_IMG/Linux/image-8.png)前面是文件类型及权限  第二列是连接数  第三为作者  第四列为大小（bate）  时间   文件（夹）名字
 5. 最最常用的切换命令：cd
-   + ![cd常用语法](image-9.png)
+   + ![cd常用语法](./.assets_IMG/Linux/image-9.png)
    + 注意使用cd使用的绝对路径和相对路径，熟练使用相对路径会节省大量时间
    + cd..：退回上一路径
    + cd（直接回车）或者cd ~：回到家目录
@@ -42,7 +42,7 @@
 6. mv `文件名` `地址` `重命名文件名`
 ## 查看文件内容命令
 1. cat `文件名`：查看文件内容
-2. cat -n `文件名`：带上行号（有回车则是换行）![查看文件示意图](image-10.png)
+2. cat -n `文件名`：带上行号（有回车则是换行）![查看文件示意图](./.assets_IMG/Linux/image-10.png)
 3. more `文件名`：全屏按页显示，操作之后可通过若干快捷键查看内容
 4. less `要查看的文件`：效率高，可以根据文件的大小来显示内容，推荐使用，功能比more强大
 5. q：离开这个程序
@@ -54,20 +54,20 @@
 3. tail `文件`：查看后10行内容
 ## 打印信息，输出命令（同c++）
 1. echo
-![alt text](image-11.png)
-![alt text](image-12.png)
-![alt text](image-13.png)
+![alt text](./.assets_IMG/Linux/image-11.png)
+![alt text](./.assets_IMG/Linux/image-12.png)
+![alt text](./.assets_IMG/Linux/image-13.png)
 ## 覆盖与追加
 1. `ll > 1.txt`：覆盖`1.txt`中的内容
 2. `ll >> 1.txt`：在`1.txt`后追加内容
 ## 硬链接、软链接不常用
 ## history
 1. history：查看所有历史命令
-2. ![alt text](image-14.png)
+2. ![alt text](./.assets_IMG/Linux/image-14.png)
 3. 或者按上下查看，且方便使用
 # 使用VI和VIM编辑器
 ## 什么是VI和VIM编辑器
-![alt text](image-15.png)
+![alt text](./.assets_IMG/Linux/image-15.png)
 在linux没有交互界面的环境中，可以利用VI或者VIM对一些文本来进行编辑和修改。
 ## 一般模式
 + 进入编辑界面无法使用鼠标，也叫一般模式
@@ -90,7 +90,7 @@
 4. 取消行号：`set nonu`
 5. 有的时候修改文档的权限会不够，故通常在命令后面加一个`！`。
 # VIM的三种模式的切换
-![alt text](image-16.png)
+![alt text](./.assets_IMG/Linux/image-16.png)
 # 文件查找
 1. 文件名查找
 ## 语法
@@ -109,7 +109,7 @@
 	grep aries /etc/passwd
 # 系统管理
 1. 静态查看系统进程 
-    + 使用命令`ps -aux`   ![alt text](image-18.png)
+    + 使用命令`ps -aux`   ![alt text](./.assets_IMG/Linux/image-18.png)
 2. 时时查看系统进程
     + 使用`top`命令，上下反动，q退出
 3. 关闭进程
@@ -163,13 +163,13 @@
 命令：`dpkg -S keyword 搜索所属的包内容`
 10. 配置包
 `dpkg –configure package 配置包`
-注意：详细教程可以打开[https://blog.csdn.net/qq_35078688/article/details/119382985?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522172092295616800215080288%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=172092295616800215080288&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-119382985-null-null.142^v100^pc_search_result_base8&utm_term=dpkg&spm=1018.2226.3001.4187]()
+注意：详细教程可以打开[https://blog.csdn.net/qq_35078688/article/details/119382985?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522172092295616800215080288%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=172092295616800215080288&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-119382985-null-null.142^v100^pc_search_result_base8&utm_term=dpkg&spm=1018.2226.3001.4187](./.assets_IMG/Linux/)
 # 重点！！！！！！！！！！！
 ***
 ***
 ***
 # 基于SSH的远程登陆方法的说明
-说明：Secure Shell(SSH) 是由 IETF(The Internet Engineering Task Force) 制定的建立在应用层基础上的安全网络协议。
+说明：Secure Shell(./.assets_IMG/Linux/SSH) 是由 IETF(./.assets_IMG/Linux/The Internet Engineering Task Force) 制定的建立在应用层基础上的安全网络协议。
 ## 安全机制
 1. 口令级别：只要你知道自己帐号和口令，就可以登录到远程主机。但安全度不高，容易受到攻击或者连接到错误的主机。
 2. 密钥级别：你必须为自己创建一对密钥，并把公钥放在需要访问的服务器上。
@@ -178,10 +178,10 @@
 + 可以输入`dpkg -l | grep ssh`确认或者检查电脑上是否安装了客户端和服务器。
 + 如果只是想远程登陆别的机器只需要安装客户端（Ubuntu默认安装了客户端），如果要开放本机的SSH服务就需要安装服务器。
 + 安装：
-    1. `sudo apt-get install openssh-client`(客户端)
-    2. `sudo apt-get install openssh-server`(服务器)
+    1. `sudo apt-get install openssh-client`(./.assets_IMG/Linux/客户端)
+    2. `sudo apt-get install openssh-server`(./.assets_IMG/Linux/服务器)
 ## 启动服务器的SSH服务
-1. 首先要确认ssh-server是否已经启动。在终端输入命令：`ps -e | grep ssh`![alt text](image-19.png)出现sshd，代表ssh-server已经启动了。
+1. 首先要确认ssh-server是否已经启动。在终端输入命令：`ps -e | grep ssh`![alt text](./.assets_IMG/Linux/image-19.png)出现sshd，代表ssh-server已经启动了。
     + 如果没有启动，可以使用以下命令启动。`sudo /etc/init.d/ssh start `
 2. 停止和重启ssh服务的命令分别为：
     + `sudo /etc/init.d/ssh stop `#server停止ssh服务 
@@ -195,7 +195,7 @@ eg:`ssh -X ldz@192.168.0.1`
 4. 还要说明的是，SSH服务的默认端口是22，也就是说，如果你不设置端口的话登录请求会自动送到远程主机的22端口。我们可以使用 -p 选项来修改端口号，比如连接到服务器的1234端口：`ssh -p 1234 ldz@192.168.0.1`。
 5. 客户机必须要知道服务器的ip地址。可以在服务器端电脑上利用 `ifconfig`命令查看该机的ip地址。
 6. 如果是第一次登录远程主机，系统会给出下面提示：
-   ![alt text](image-55.png)
+   ![alt text](./.assets_IMG/Linux/image-55.png)
 7. 意思是，该远程主机的真实性无法确定，其公钥指纹为 SHA256:FFobshqrGOachj7Xp4LsJ9+xkNBlyyOe8ZIPl7K+qQI，确定想要继续连接吗？
 输入yes即可。这时系统会提示远程主机被添加到已知主机列表。
 8. 然后会要求我们输入远程主机的密码，输入的密码正确就可以成功登录了。命令提示符会修改为远程主机的提示符，现在开始，终端中输入的命令都将在服务器中执行。
@@ -207,5 +207,5 @@ eg:`ssh -X ldz@192.168.0.1`
 5. 经过以上两个步骤，以后再登录这个远程主机就不用再输入密码了。
 ## 三、SSH的高级应用
 ***使用远程主机不中断的跑程序***
-+ 当我们利用ssh在远程主机上跑程序的时候，只要关闭了终端就会中断ssh连接，然后远程主机上正在跑的程序或者服务就会自动停止运行。我们可以利用`nohup + 需要运行的程序` 使运行的程序在切断ssh连接的时候仍然能够继续在远程主机中运行。`nohup`即`no hang up`(不挂起)。
-+ 除此之外还有很多远程操作应用，包括 数据传输、端口操作(将不加密的网络连接绑定到ssh端口实现间接加密) 等等，可以参考柚子皮大神的博客：[https://blog.csdn.net/pipisorry/article/details/52269785]()
++ 当我们利用ssh在远程主机上跑程序的时候，只要关闭了终端就会中断ssh连接，然后远程主机上正在跑的程序或者服务就会自动停止运行。我们可以利用`nohup + 需要运行的程序` 使运行的程序在切断ssh连接的时候仍然能够继续在远程主机中运行。`nohup`即`no hang up`(./.assets_IMG/Linux/不挂起)。
++ 除此之外还有很多远程操作应用，包括 数据传输、端口操作(./.assets_IMG/Linux/将不加密的网络连接绑定到ssh端口实现间接加密) 等等，可以参考柚子皮大神的博客：[https://blog.csdn.net/pipisorry/article/details/52269785](./.assets_IMG/Linux/)
