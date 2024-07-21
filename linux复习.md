@@ -647,4 +647,14 @@
 ## SSH
 + ssh 远程linux的ip或者映射域名
 ## windows系统使用git教程的一些说明
-1. 安装
+1. 安装Git。打开浏览器搜索Git，下载，最好安装在C盘（安装在其他盘可能会导致使用期间出现无法解释的错误）
+2. 安装好Git之后，我们打开Git Bush。在终端依次输入git config --global user.name "Yunxia"和git config --global user.email "2226038143@qq.com"。这里双引号中的分别是电脑的用户名和注册Github时所用的邮箱。
+3. 在终端输入ssh-keygen -t rsa -C "My-SSH"，创建以rsa为加密方式的公钥。和Linux系统不同的是，创建好密钥以后会在C盘，C/用户/"用户名"/.ssh文件夹中生成一个.pub文件，这里面贮存的是密钥，我们以记事本的方式打开，并复制。![alt text](.assets_IMG/linux复习/image-98.png)
+4. 复制以后，我们登录Github，进入settings，点击左侧SSH and GPG keys选项。![](.assets_IMG/linux复习/image-96.png)  
+点击New SSH key![alt text](.assets_IMG/linux复习/image-97.png)。输入好Title（随意输入）后在key框中粘贴刚才得到的密钥。
+5. 至此，密钥的配对已经完成。
+6. 我们打开任意文件夹，在文件夹下建立一个 测试文件，内容暂时随意写入。![alt text](.assets_IMG/linux复习/image-99.png)
+7. 然后在当前文件夹打开Git Bash，在终端输入git init，初始化一个空的本地仓库。接着终端输入git add .  将该文件夹中所有的文件上传至临时仓库，输入git commit,将文件上传至本地仓库。
+8. 进入GitHub，新建一个仓库。![alt text](.assets_IMG/linux复习/image-100.png)。输入好name以后直接点击Create repository。创建一个新的仓库。
+9. ![alt text](.assets_IMG/linux复习/image-101.png)。按照顺序，以此在终端复制进这三条指令。![alt text](.assets_IMG/linux复习/image-102.png)显示同步成功
+10. 打开Github，刷新，![alt text](.assets_IMG/linux复习/image-103.png)，我们发现文件已经顺利上传至Github云端。
