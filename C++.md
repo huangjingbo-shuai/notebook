@@ -198,3 +198,7 @@
 + ![alt text](.assets_IMG/C++/image-115.png)
 + ![alt text](.assets_IMG/C++/image-116.png)
 + ![alt text](.assets_IMG/C++/image-117.png)
+## 文件操作：写文件
+1. ![alt text](.assets_IMG/C++/image-119.png)
+2. 5个步骤：![alt text](.assets_IMG/C++/image-120.png)
+3. ![alt text](.assets_IMG/C++/image-121.png)
