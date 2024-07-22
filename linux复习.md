@@ -661,4 +661,5 @@
 11. 说明：密钥的配对是一次性操作，一个系统只需要配对一次，但是配置用户和Github用户是需要每次启动系统都配置的，否则系统无法与云端建立联系，就无法将文件上云。
 ## windows系统利用vscode从Github云同步在Ubuntu系统中上云的文件，实现windows系统和Ubuntu系统的数据同步
 1. 在桌面打开Git Bash终端。先配置电脑用户和Github用户，![alt text](.assets_IMG/linux复习/image-104.png)。
-2. 打开一个想要同步文件的仓库，复制该仓库的Url。![alt text](.assets_IMG/linux复习/image-105.png)。在终端输入git clone <复制的Url>。回车，即可在桌面得到仓库中的所有文件。
+2. 打开一个想要同步文件的仓库，复制该仓库的Url。![alt text](.assets_IMG/linux复习/image-105.png)。在终端输入git clone <复制的Url>。回车，即可在桌面得到仓库中的所有文件。此后只需要在linux端拉取仓库中的新内容即可。
+## linux系统使用git教程的一些说明
