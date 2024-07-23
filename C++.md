@@ -202,3 +202,92 @@
 1. ![alt text](.assets_IMG/C++/image-119.png)
 2. 5个步骤：![alt text](.assets_IMG/C++/image-120.png)
 3. ![alt text](.assets_IMG/C++/image-121.png)
+# 模板
+1. 本阶段主要针对C++泛型编程和STL技术做详细讲解，探讨C++更深层次的使用
+2. ![alt text](.assets_IMG/C++/image-122.png)
+3. 特点：![alt text](.assets_IMG/C++/image-123.png)
+## 函数模板
++ ![alt text](.assets_IMG/C++/image-124.png)
++ 语法：![alt text](.assets_IMG/C++/image-125.png)
++ 实例：
+
+        创建两个函数，![alt text](.assets_IMG/C++/image-126.png)
+        发现两个函数除了传入的数据类型不一样以外，几乎都是一样的，为了再调用时更方便，是语言具有一定的复用性，我们利用函数模板的概念和方法，为这两个函数创建一个模板!![alt text](.assets_IMG/C++/image-128.png)
+        这样一来，函数的调用就非常简介明了了，甚至使用自动识别的方式来引用。
+## 模板的注意事项
+1. template<typename>//typename 可以替换成class，但人们通常用class来区分类模板，其他情况也可以使用，但始终要养成使得代码具有一点可读性的好习惯
+2. 自动类型推导，必须要推导出一致的数据类型T才可以使用
+3. 模板必须要确定出T的数据类型，才可以使用
+## 函数模板案例
+1. ![alt text](.assets_IMG/C++/image-129.png)
+2. ![alt text](.assets_IMG/C++/image-130.png)
+3. ![alt text](.assets_IMG/C++/image-131.png)
+## 普通函数和函数模板的区别
+1. ![alt text](.assets_IMG/C++/image-132.png)
+2. ![alt text](.assets_IMG/C++/image-133.png)
+## 普通函数与函数模板的调用规则
+1. 如果函数模板和普通函数都可以实现，优先调用普通函数
+2. 可以铜通过空模板参数列表来强制调用函数模板
+3. 函数模板也可以发生重载
+4. 如果函数模板可以产生更好的匹配，优先调用函数模板
+5. 实例：
+
+        ![alt text](.assets_IMG/C++/image-134.png)
+        ![alt text](.assets_IMG/C++/image-135.png)
+        注意：既然提供了函数模板，最好就不要提供普通函数，否则容易出现二义性
+## 模板的局限性
+1. 局限性：模板的通用性并不是万能的  例如：![alt text](.assets_IMG/C++/image-136.png)  再例如：![alt text](.assets_IMG/C++/image-137.png)
+2. ![alt text](.assets_IMG/C++/image-138.png)
+3. ![alt text](.assets_IMG/C++/image-139.png)
+4. ![alt text](.assets_IMG/C++/image-140.png)
+5. 总结
+
+        + 利用具体化模板，可以解决自定义类型的通用化
+        + 学习模板并不是为了写模板，而是在STL能够运用系统提供的模板
+6. 其实这段代码中对Person这个类的模板的编写与规定，就相当于是重载了”=“号，当然也可以直接用运算符重载的方式，重载”=“号，以达到目的，但是直接重载相对较为麻烦，所以这里用模板的方式。
+## 类模板
+1. ![alt text](.assets_IMG/C++/image-141.png)
+2. ![alt text](.assets_IMG/C++/image-142.png)
+3. 这段代码中主要是要记住创建类模板的方式以及怎么规范的调用
+
+        类似函数模板，在类上面写入模板声明，这个类就称为类模板了，  template <class NameType,class AgeType>，对象中有几种数据类型就规定几种
+        在测试函数中，使用Person<string，int>p1（”孙悟空“，999）来调用
+## 类模板与函数模板的区别
++ 类模板与函数模板的区别主要有两点：  
+    1. 类模板没有自动类型推导的使用方式
+![alt text](.assets_IMG/C++/image-143.png)
+    2. 类模板在模板参数列表中可以有默认参数
+![alt text](.assets_IMG/C++/image-144.png)
+如果传了，就用你的，如果没传就用默认类型
+## 类模板中的成员函数创建时机
++ 类模板中成员函数和普通类中成员函数创建时机是有区别的：  
+    
+    1. 普通类中的成员函数一开始就可以创建
+    2. 类模板中的成员函数在调用时才创建
++ ![alt text](.assets_IMG/C++/image-145.png)
++ 总结：类模板中的成员函数并不是一开始就创建的，在调用时才去创建的。
+## 类模板对象做函数参数
+1. ![alt text](.assets_IMG/C++/image-146.png)
+2. 代码实现：  
+![alt text](.assets_IMG/C++/image-147.png)
+![alt text](.assets_IMG/C++/image-148.png)
+3. 总结：
+
+        + 通过类模板创建的对象，可以有三种方式像函数中进行传参
+        + 使用比较广泛的是第一种：指定传入类型
+## 类模板与继承
+当类模板碰到继承时，需要注意以下几点：
+  + 当子类继承的父类是一个类模板时，子类在声明的时候，要指定出父类中T的类型
+  + 如果不指定，编译器无法给子类分配内存
+  + 如果想灵活指定出父类中T类型，子类也需变为类模板
+总结：正常来讲一般不会这么用，除非是碰到及其复杂的情况，我们一般会将代码写的尽量具有可读性，过于简单或者过于抽象，反而不利于读懂代码。只需要知道，如果父类时类模板，子类需要指定出父类中T的数据类型。 
+## 类模板中成员函数的类外实现
+1. ![alt text](.assets_IMG/C++/image-149.png)
+2. 总结：  类模板中成员函数类外实现时，需要加上模板参数列表。
+## 类模板分文件编写
+![alt text](.assets_IMG/C++/image-151.png)
+![alt text](.assets_IMG/C++/image-150.png)
+## 类模板与友元
+![alt text](.assets_IMG/C++/image-152.png)
+实例： 
+![alt text](.assets_IMG/C++/image-153.png)
