@@ -291,3 +291,116 @@
 ![alt text](.assets_IMG/C++/image-152.png)
 实例： 
 ![alt text](.assets_IMG/C++/image-153.png)
+# STL
+## 初步认识STL
+1. ![alt text](.assets_IMG/C++/image-154.png)
+2. ![alt text](.assets_IMG/C++/image-155.png)
+3. ![alt text](.assets_IMG/C++/image-156.png)
+4. ![alt text](.assets_IMG/C++/image-157.png)
+5. ![alt text](.assets_IMG/C++/image-158.png)
+6. ![alt text](.assets_IMG/C++/image-159.png) 
+  使用的时候把迭代器当成指针来看
+##  容器算法迭代器初识
+了解STL中容器、算法、迭代器的概念之后，我们利用代码感受STL的魅力。  STL中最常用的容器为Vector，可以理解为数组，下面我们将学习如何向这个容器中插入数据、并便利这个容器。 
+![alt text](.assets_IMG/C++/image-160.png)
+![alt text](.assets_IMG/C++/image-161.png)
++ 首先先创建vector容器对象，并且通过模板参数指定容器中存放的类型。
++ 用push_back命令向容器中放数据
++ 每一个容器都有自己的迭代器，迭代器是用来遍历容器中的元素。
++ v.begin()返回迭代器，这个迭代器指向容器中的第一个数据。
++ v.end（）返回迭代器，这个迭代器指向容器元素中的最后一个元素的下一个位置 
++ vector<int>::iterator 拿到vector<int>这种容器的迭代器类型
++ 第一种遍历方式是用while循环的方式
++ 第二种遍历方式是用for循环的方式
++ 第三种遍历方式用STL提供标准遍历算法，头文件 algorithm。特别要注意使用时候的语法。
+## vector中存放自定义数据类型 ，并打印输出
+![alt text](.assets_IMG/C++/image-162.png)
+## 容器嵌套容器
+![alt text](.assets_IMG/C++/image-163.png)
+## string容器
+本质：  
++ string是C++风格的字符串，而string本质上是一个类  
+string和char*区别：  
++ char*是一个指针
++ string是一个类，类内部封装了char*，管理这个字符串，是一个char*型的容器
+特点：  
+1. string类内部封装了很多成员方法  例如：查找find，拷贝copy，删除delete，替换replace，插入insert
+2. string管理char*所分配的内存，不用担心复制越界和取值越界等，由类内部进行负责
+3. ![alt text](.assets_IMG/C++/image-164.png)
+##  string赋值操作
+![alt text](.assets_IMG/C++/image-165.png)
+![alt text](.assets_IMG/C++/image-166.png)
+## string字符串的拼接
+![alt text](.assets_IMG/C++/image-167.png)
+1. ![alt text](.assets_IMG/C++/image-168.png)
+2. ![alt text](.assets_IMG/C++/image-169.png)
+3. ![alt text](.assets_IMG/C++/image-170.png)
+4. 总结：字符串拼接的重载版本很多，初学阶段记住几种即可。
+## string的查找和替换
+1. ![alt text](.assets_IMG/C++/image-171.png)
+2. find查找：  ![alt text](.assets_IMG/C++/image-172.png)，如果没有该字符串则返回负一。  ![alt text](.assets_IMG/C++/image-173.png)
+3. rfind：  和find的区别是rfind是从右往左查找 ，find是从左往右查找  ![alt text](.assets_IMG/C++/image-174.png)
+4. 替换：  ![alt text](.assets_IMG/C++/image-175.png)，  ![alt text](.assets_IMG/C++/image-176.png)，把从1到3的字符串全部替换成`1111`，有多少替换多少。
+5. 总结：  
++ find查找是从左往右，rfind是从右往左
++ find找到字符串后返回查找的第一个字符位置，找不到返回-1
++ replace在替换时，要指定从哪个位置起，多少个字符，替换成什么样的字符串。
+## string字符串的比较
+1. ![alt text](.assets_IMG/C++/image-177.png)
+2. ![alt text](.assets_IMG/C++/image-178.png)
+3. ![alt text](.assets_IMG/C++/image-179.png)
+4. 总结：字符串对比主要适用于比较两个字符串是否相等，判断谁打谁小的意义不是很大。
+## string中的字符存取
+1. ![alt text](.assets_IMG/C++/image-180.png)
+2. ![alt text](.assets_IMG/C++/image-181.png) 
+3. 通过[]访问单个字符：  ![alt text](.assets_IMG/C++/image-182.png)
+4. 通过at方式访问单个字符：  ![alt text](.assets_IMG/C++/image-183.png)
+5. 修改单个字符[]：  ![alt text](.assets_IMG/C++/image-184.png)
+6. 修改单个字符at：  ![alt text](.assets_IMG/C++/image-185.png)
+## string中的插入和删除
+1. ![alt text](.assets_IMG/C++/image-186.png)
+2. 通过insert插入：  ![alt text](.assets_IMG/C++/image-187.png)
+3. 通过erase删除：  ![alt text](.assets_IMG/C++/image-188.png)
+4. 总结：插入和删除的起始下标都是从0开始
+## string子串
+1. ![alt text](.assets_IMG/C++/image-189.png)
+2. substr来求子串  ![alt text](.assets_IMG/C++/image-190.png)
+3. 使用操作  ![alt text](.assets_IMG/C++/image-191.png)（0，8），从0开始不包括8
+4. 总结：  灵活的运用求子串的功能，可以在实际开发中获取有效的信息。
+## vector容器
+1. ![alt text](.assets_IMG/C++/image-192.png)
+2. ![alt text](.assets_IMG/C++/image-193.png)
+3. ![alt text](.assets_IMG/C++/image-194.png)
+4. ![alt text](.assets_IMG/C++/image-195.png)
+5. 总结：  vector的多种构造方式没有可比性，灵活使用即可。
+## vector赋值操作
+1. ![alt text](.assets_IMG/C++/image-196.png)
+2. ![alt text](.assets_IMG/C++/image-197.png)
+3. 总结：vector赋值方式比较简单，使用operator=，或者assign都可以。
+## vector容量和大小
+1. ![alt text](.assets_IMG/C++/image-198.png)
+2. ![alt text](.assets_IMG/C++/image-199.png)
+3. 总结：
+
+        + 判断是否为空——empty
+        + 返回元素个数——size
+        + 返回容器容量——capacity
+        + 重新制定大小——resize
+## vector插入和删除
+1. ![alt text](.assets_IMG/C++/image-200.png)
+2. ![alt text](.assets_IMG/C++/image-201.png)
+3. 总结：  
+
+        + 尾插——push_back
+        + 尾删——pop_back
+        + 插入——insert（位置迭代器）
+        + 删除——erase（位置迭代器）
+        + 清空——clear
+## vector容器数据储存
+1. ![alt text](.assets_IMG/C++/image-202.png)
+2. ![alt text](.assets_IMG/C++/image-203.png)
+3. 总结：   
+
+        + 除了用迭代器获取vector容器中的元素，[]和at也可以
+        + front返回容器第一个元素
+        + back返回容器最后一个元素

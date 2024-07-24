@@ -663,3 +663,11 @@
 1. 在桌面打开Git Bash终端。先配置电脑用户和Github用户，![alt text](.assets_IMG/linux复习/image-104.png)。
 2. 打开一个想要同步文件的仓库，复制该仓库的Url。![alt text](.assets_IMG/linux复习/image-105.png)。在终端输入git clone <复制的Url>。回车，即可在桌面得到仓库中的所有文件。此后只需要在linux端拉取仓库中的新内容即可。
 ## linux系统使用git教程的一些说明
+## 管道命令
++ 简单来说，Linux中管道的作用是将上一个命令的输出作为下一个命令的输入，像pipe一样将各个命令串联起来执行，管道的操作符是`|`。
+1. 利用管道命令查看当前运行的程序中，名为java的程序  ：ps -ef|grep java
+2. 查看/etc/passwd文件中的root内容  :cat /etc/passwd | grep 'root'
+3. 查看当前系统的ip链接  ：netstat -an
+4. 将sh test.sh任务放到后台，并将打印的日志输出到`nohup.out`文件中，终端不再能够接收任何输入（标准输入）：  nohup sh test.sh  &
+5. 将sh test.sh任务放到后台，并将打印的日志输出到test.out文件中，终端不再能够接收任何输入（标准输入）:  nohup sh test.sh >> test.out  &
+6. 将sh test.sh任务放到后台，并将打印的日志输出到nohup.out文件中，终端能够接收任何输入:  nohup sh test.sh  &
