@@ -404,3 +404,207 @@ string和char*区别：
         + 除了用迭代器获取vector容器中的元素，[]和at也可以
         + front返回容器第一个元素
         + back返回容器最后一个元素
+## vector互换容器
+1. ![alt text](.assets_IMG/C++/image-204.png)
+2. ![alt text](.assets_IMG/C++/image-205.png)
+3. ![alt text](.assets_IMG/C++/image-206.png)
+4. 总结： swap可以使两个容器互换，可以达到使用的收缩内存效果
+## vector容器的预留空间
+1. ![alt text](.assets_IMG/C++/image-207.png)
+2. ![alt text](.assets_IMG/C++/image-208.png)
+3. 总结：如果数据量较大，可以一开始利用reserve预留空间，节省空间和性能。
+## deque容器的概念
+1. ![alt text](.assets_IMG/C++/image-209.png)
+2. ![alt text](.assets_IMG/C++/image-211.png)
+3. deque容器的构造函数：  ![alt text](.assets_IMG/C++/image-212.png)
+4. 总结：  deque容器和vector容器的构造方式几乎一致，灵活使用即可
+## deque的赋值操作
+1. ![alt text](.assets_IMG/C++/image-213.png)
+2. ![alt text](.assets_IMG/C++/image-214.png)
+3. ![alt text](.assets_IMG/C++/image-215.png)
+4. 总结： deque赋值操作也与vector相同，需要熟练掌握
+## deque大小操作
+1. ![alt text](.assets_IMG/C++/image-216.png)
+2. ![alt text](.assets_IMG/C++/image-217.png)
+3. 但是需要注意的是，deque容器没有容量的概念，它可以无限的存放数据进去
+4. ![alt text](.assets_IMG/C++/image-218.png)
+5. 总结：  
+
+        + deque没有容量的概念
+        + 判断是否为空——empty
+        + 返回元素个数——size
+        + 重新指定个数——resize
+## deque插入和删除
+1. ![alt text](.assets_IMG/C++/image-219.png)
+2. ![alt text](.assets_IMG/C++/image-220.png)
+3. 总结：  
+        
+        + 插入和删除提供的位置是迭代器
+        + 尾插——push_back
+        + 尾删——pop_front
+        + 头插——push_front
+        + 头删——pop_front
+## 数据存取
+1. ![alt text](.assets_IMG/C++/image-221.png)
+2. ![alt text](.assets_IMG/C++/image-222.png)
+3. ![alt text](.assets_IMG/C++/image-223.png)
+4. 总结：  
+        + 除了用迭代器获取deque容器中的元素，[]和at也可以
+        + front返回容器第一个元素
+        + back返回容器最后一个元素
+## deque容器的排序
+1. ![alt text](.assets_IMG/C++/image-224.png)
+2. ![alt text](.assets_IMG/C++/image-225.png)
+3. 要注意的是，sort算法排序的规则是从小到大 
+4. 对于支持随机访问的迭代器的容器，都可以利用sort算法直接对其进行排序
+5. vector容器也可以利用sort进行排序
+6. 总结：   sort算法非常实用，使用时包含头文件<algorithm>即可。
+## stack容器基本概念
+1. ![alt text](.assets_IMG/C++/image-226.png)
+2. ![alt text](.assets_IMG/C++/image-227.png)  栈不允许有遍历行为，因为只有栈顶部的元素才能被访问到。栈可以判断容器是否为空，用empty。栈也可以返回元素个数，用size
+3. 另外，栈区是自上向下的。而堆区是自下向上的。
+4. ![alt text](.assets_IMG/C++/image-228.png)  生活中的弹匣实际上就是栈
+## stack常用接口
+1. ![alt text](.assets_IMG/C++/image-229.png)
+2. ![alt text](.assets_IMG/C++/image-230.png)
+3. 总结：  
+        + 入栈——push
+        + 出栈——pop
+        + 返回栈顶——top
+        + 判断是否为空——empty
+        + 返回栈大小——size
+## queue容器
+1. 队列是先进先出
+2. ![alt text](.assets_IMG/C++/image-231.png)
+3. ![alt text](.assets_IMG/C++/image-233.png)
+4. ![alt text](.assets_IMG/C++/image-235.png)  生活中排队打饭就是队列的实例
+## queue常用接口
+1. ![alt text](.assets_IMG/C++/image-236.png)
+2. ![alt text](.assets_IMG/C++/image-237.png)
+3. 总结：  
+        + 入队——push
+        + 出队——pop
+        + 返回队头元素——front
+        + 返回队尾元素——back
+        + 判断队是否为空——empty
+        + 返回队列大小——size
+## list容器
+1. ![alt text](.assets_IMG/C++/image-238.png)
+2. ![alt text](.assets_IMG/C++/image-239.png)  缺点是：容器遍历速度没有数组快，而且它占用的空间比数组大。
+3. ![alt text](.assets_IMG/C++/image-240.png)
+4. ![alt text](.assets_IMG/C++/image-241.png)
+## list容器的构造函数
+1. ![alt text](.assets_IMG/C++/image-242.png)
+2. ![alt text](.assets_IMG/C++/image-243.png)
+3. 总结：  list构造方式同其他几个STL常用容器，熟练掌握即可。
+## list容器赋值和交换
+1. ![alt text](.assets_IMG/C++/image-244.png)
+2. ![alt text](.assets_IMG/C++/image-245.png)
+3. ![alt text](.assets_IMG/C++/image-246.png)
+4. ![alt text](.assets_IMG/C++/image-247.png)
+## list大小操作
+1. ![alt text](.assets_IMG/C++/image-248.png)
+2. ![alt text](.assets_IMG/C++/image-250.png)
+3. ![alt text](.assets_IMG/C++/image-251.png)
+4. 总结：  
+        + 判断是否为空——empty
+        + 返回元素个数——size
+        + 重新指定个数——resize
+## list容器的插入和删除
+1. ![alt text](.assets_IMG/C++/image-252.png)
+2. ![alt text](.assets_IMG/C++/image-253.png)
+3. ![alt text](.assets_IMG/C++/image-254.png)
+4. ![alt text](.assets_IMG/C++/image-255.png)
+5. ![alt text](.assets_IMG/C++/image-256.png)
+6. ![alt text](.assets_IMG/C++/image-257.png)
+7. ![alt text](.assets_IMG/C++/image-258.png)
+8. 总结：
+        + 尾插——push_back
+        + 尾删——pop_back
+        + 头插——push_front
+        + 头删——pop_front
+        + 插入——insert
+        + 删除——erase
+        + 移除——remove
+        + 清空——clear
+## list容器的数据存取
+1. ![alt text](.assets_IMG/C++/image-259.png)
+2. L[0]  不可以用[]方式访问list容器中的元素
+3. L.at(0)  不可以用at方式访问list容器中的元素
+4. 原因是list本质是一个链表，不是用连续线性空间存储数据，迭代器也是不支持随机访问的。
+5. ![alt text](.assets_IMG/C++/image-260.png)
+6. ![alt text](.assets_IMG/C++/image-261.png)
+7. 总结：  
+        + list容器不可以通过[]和at()方式访问数据
+        + 返回第一个元素——front
+        + 返回最后一个元素——back
+## list 容器中的反转和排序
+1. ![alt text](.assets_IMG/C++/image-262.png)
+2. ![alt text](.assets_IMG/C++/image-263.png)
+3. 注意：  所有不支持随机访问迭代器的容器，不可以用标准的算法。不支持随机访问嗲带起的容器，内部会提供对应的一些算法。例如下图就是需要调用成员函数才能使用sort，默认的排序规则是从小到大。降序排序直接用reverse  ![alt text](.assets_IMG/C++/image-264.png)
+4. 总结：  
+        + 反转——reverse
+        + 排序——sort（成员函数）
+## set容器
+1. ![alt text](.assets_IMG/C++/image-265.png)
+2. ![alt text](.assets_IMG/C++/image-266.png)
+3. ![alt text](.assets_IMG/C++/image-267.png)
+4. 总结：  
+        + set容器插入的数据时应该用insert
+        + set容器插入数据时会自动排序
+        + multiset插入数据时可以产生重复
+## set大小和交换
+1. ![alt text](.assets_IMG/C++/image-268.png)
+2. ![alt text](.assets_IMG/C++/image-269.png)
+3. ![alt text](.assets_IMG/C++/image-270.png)
+4. ![alt text](.assets_IMG/C++/image-271.png)
+5. 总结：  
+        + 统计大小——size
+        + 判断是否为空——empty
+        + 交换容器——swap
+## set插入和删除
+1. ![alt text](.assets_IMG/C++/image-272.png)
+2. ![alt text](.assets_IMG/C++/image-274.png)
+3. 总结：  
+        + 插入——insert
+        + 删除——erase
+        + 情况——clear
+## set容器的查找和统计
+1. ![alt text](.assets_IMG/C++/image-275.png)
+2. ![alt text](.assets_IMG/C++/image-276.png)
+3. ![alt text](.assets_IMG/C++/image-277.png)   //对于set而言统计结果要么是0要么是1，但对于multiset则不一样
+4. 总结：   
+        + 查找——find（返回的是迭代器）
+        + 统计——count（对于set，结果为0或者1）
+## set和multiset的区别
+1. ![alt text](.assets_IMG/C++/image-278.png)
+2. 总结：  
+        + 如果不允许插入重复的数据可以利用set
+        + 如果需要插入重复数据利用multiset
+## pair对组的创建
+1. ![alt text](.assets_IMG/C++/image-279.png)
+2. ![alt text](.assets_IMG/C++/image-280.png)
+3. 总结：两种方法都可以创建队组，记住一种即可。
+## set容器的排序
+1. ![alt text](.assets_IMG/C++/image-281.png)
+2. ![alt text](.assets_IMG/C++/image-282.png)
+3. 总结：  
+        + 利用仿函数可以指定set容器的排序规则。
+## set容器存放自定义内容
+1. ![alt text](.assets_IMG/C++/image-283.png)
+2. 对于自定义数据类型，set必须指定排序规则才可以插入数据
+## map基本概念（类似python中的字典）
+1. ![alt text](.assets_IMG/C++/image-284.png)
+## map构造和赋值
+1. ![alt text](.assets_IMG/C++/image-285.png)
+2. 总结：  
+        + map中所有的元素都是成对出现，插入数据时候要使用对组。
+## map大小和交换
+1. ![alt text](.assets_IMG/C++/image-286.png)
+2. ![alt text](.assets_IMG/C++/image-287.png)
+3. ![alt text](.assets_IMG/C++/image-288.png)
+4. 总结：  
+        + 统计大小——size
+        + 判断是否为空——empty
+        + 交换容器——swap
+
