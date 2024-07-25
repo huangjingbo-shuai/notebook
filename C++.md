@@ -608,3 +608,36 @@ string和char*区别：
         + 判断是否为空——empty
         + 交换容器——swap
 
+## map的插入和删除
+1. ![alt text](.assets_IMG/C++/image-289.png)
+2. 插入：  ![alt text](.assets_IMG/C++/image-290.png)
+3. ![alt text](.assets_IMG/C++/image-291.png)  按照key的值来删除。
+4. 总结：  
+        + map插入的方式有很多种，记住一种即可
+        + 插入——insert
+        + 删除——erase
+        + 清空——clear
+## map查找和统计
+1. ![alt text](.assets_IMG/C++/image-292.png)
+2. ![alt text](.assets_IMG/C++/image-293.png)
+3. ![alt text](.assets_IMG/C++/image-294.png)
+4. 总结：  
+        + 查找——find（返回的是迭代器）
+        + 统计——count（对于map，结果为0或者1）
+## map容器的排序操作
+1. ![alt text](.assets_IMG/C++/image-295.png)
+2. 总结：  ![alt text](.assets_IMG/C++/image-296.png)
+## 函数对象
+1. ![alt text](.assets_IMG/C++/image-297.png)
+2. ![alt text](.assets_IMG/C++/image-298.png)
+3. ![alt text](.assets_IMG/C++/image-299.png)
+4. ![alt text](.assets_IMG/C++/image-300.png)
+## 一元谓词
+1. ![alt text](.assets_IMG/C++/image-301.png)
+2. ![alt text](.assets_IMG/C++/image-302.png)
+3. 总结：  返回参数只有一个参数的仿函数，称为一元谓词
+## 二元谓词
+1. ![alt text](.assets_IMG/C++/image-303.png)
+2. ![alt text](.assets_IMG/C++/image-304.png)
+3. 在sort算法（）中的第三个位置是可以规定其算法规则的。
+4. ![alt text](.assets_IMG/C++/image-305.png)
