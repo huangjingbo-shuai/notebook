@@ -645,23 +645,54 @@
 
     + $:vim/etc/hosts
 ## SSH
-+ ssh 远程linux的ip或者映射域名
++ 在终端输入指令`ssh ro@192.168.1.104`，  这里的ro指的是要链接的linux端（服务器）的用户名。 回车连接成功。
++ 连接成功后就可以在指定系统上进行特定的操作。
++ 在本地把文件夹推送至指定服务器的文件夹：  
+    + scp -r /home/yunxia/test ro@192.168.1.103:/home/ro/program
++ 在本地拿取指定服务器的文件：  
+    + scp -r ro@192.168.1.103:/home/ro/program /home/yunxia/test
+# 设置静态IP
+## 通过图形界面设置
+1. 在linux上设置静态ip，可以通过这种方式，快捷的设置，但是设置完成后一定要注意，如下第二张图中所示，要将有线连接断开并重连一次，这样才能正确设置静态ip。  ![alt text](.assets_IMG/linux复习/image-106.png)  修改地址选项即可。  地址填：192.168.1.31  子网掩码固定填写255.255.255.0  网关固定填写：192.168.1.1  说明：
+    + 地址的第四位参数是路由器分配的地址，这个参数要尽量独一无二，保证在同一局域网下不与别的客户机发生冲突，如果发生冲突则需要修改一个即可。
+    + 子网掩码一般是固定的，它会过滤出网段分配给用户。
+    + 网关则是路由器的IP地址，但两个不同的路由器可能会有相同的网关，不过一般都是固定的。
+## 通过yaml文件设置
+1. 打开终端，在终端输入`ifconfig`命令，查看当前网卡
+2. 继续在终端输入`route -n`查看当前网关，这一布要注意，不然配置的时候网关不对会导致配置完之后虽然有IP，但是无法链接网络的情况
+3. 继续在终端将输入指令`sudo vim /etc/netplan/01-network-manager-all.yaml`，修改yaml文件如下（注意格式要正确，每个冒号后要留一个空格）：  
+        
+        network:
+        version: 2
+        renderer: NetworkManager
+        ethernets: 
+            wlp4s0: 
+        addresses: [192.168.1.201/24]
+        gateway4: 192.168.1.1
+        nameservers: 
+            addresses: [114.114.114.114, 8.8.8.8]
+        mtu: 9000
++ 终端输入`sudo netplan apply`，如果没有任何提示说明就生效了。
++ 注意，以上的第五行`wlp4s0`是网关，即在终端查到的  ![alt text](.assets_IMG/linux复习/image-107.png)
++ DNS域名也要设置正确 [114.114.114.114, 8.8.8.8] ，分别是电信和谷歌
+## vscode实现SSH远程通讯
+1. 打开vscode，  ![alt text](.assets_IMG/linux复习/image-108.png)    
+2. 从下至上第一个，点击选项叫做远程资源管理器，右击SSH新建远程，输入命令`ssh ro@192.168.1.103`,回车配置成功，点击-->符号连接至远程客户端。
 ## windows系统使用git教程的一些说明
 1. 安装Git。打开浏览器搜索Git，下载，最好安装在C盘（安装在其他盘可能会导致使用期间出现无法解释的错误）
 2. 安装好Git之后，我们打开Git Bush。在终端依次输入git config --global user.name "Yunxia"和git config --global user.email "2226038143@qq.com"。这里双引号中的分别是电脑的用户名和注册Github时所用的邮箱。
 3. 在终端输入ssh-keygen -t rsa -C "My-SSH"，创建以rsa为加密方式的公钥。和Linux系统不同的是，创建好密钥以后会在C盘，C/用户/"用户名"/.ssh文件夹中生成一个.pub文件，这里面贮存的是密钥，我们以记事本的方式打开，并复制。![alt text](.assets_IMG/linux复习/image-98.png)
 4. 复制以后，我们登录Github，进入settings，点击左侧SSH and GPG keys选项。![](.assets_IMG/linux复习/image-96.png)  
 点击New SSH key![alt text](.assets_IMG/linux复习/image-97.png)。输入好Title（随意输入）后在key框中粘贴刚才得到的密钥。
-5. 至此，密钥的配对已经完成。
-6. 我们打开任意文件夹，在文件夹下建立一个 测试文件，内容暂时随意写入。![alt text](.assets_IMG/linux复习/image-99.png)
-7. 然后在当前文件夹打开Git Bash，在终端输入git init，初始化一个空的本地仓库。接着终端输入git add .  将该文件夹中所有的文件上传至临时仓库，输入git commit,将文件上传至本地仓库。
-8. 进入GitHub，新建一个仓库。![alt text](.assets_IMG/linux复习/image-100.png)。输入好name以后直接点击Create repository。创建一个新的仓库。
-9. ![alt text](.assets_IMG/linux复习/image-101.png)。按照顺序，以此在终端复制进这三条指令。![alt text](.assets_IMG/linux复习/image-102.png)显示同步成功
-10. 打开Github，刷新，![alt text](.assets_IMG/linux复习/image-103.png)，我们发现文件已经顺利上传至Github云端。
-11. 说明：密钥的配对是一次性操作，一个系统只需要配对一次，但是配置用户和Github用户是需要每次启动系统都配置的，否则系统无法与云端建立联系，就无法将文件上云。
+1. 至此，密钥的配对已经完成。
+2. 我们打开任意文件夹，在文件夹下建立一个 测试文件，内容暂时随意写入。![alt text](.assets_IMG/linux复习/image-99.png)
+3. 然后在当前文件夹打开Git Bash，在终端输入git init，初始化一个空的本地仓库。接着终端输入git add .  将该文件夹中所有的文件上传至临时仓库，输入git commit,将文件上传至本地仓库。
+4. 进入GitHub，新建一个仓库。![alt text](.assets_IMG/linux复习/image-100.png)。输入好name以后直接点击Create repository。创建一个新的仓库。
+5. ![alt text](.assets_IMG/linux复习/image-101.png)。按照顺序，以此在终端复制进这三条指令。![alt text](.assets_IMG/linux复习/image-102.png)显示同步成功
+6.  打开Github，刷新，![alt text](.assets_IMG/linux复习/image-103.png)，我们发现文件已经顺利上传至Github云端。
+7.  说明：密钥的配对是一次性操作，一个系统只需要配对一次，但是配置用户和Github用户是需要每次启动系统都配置的，否则系统无法与云端建立联系，就无法将文件上云。
 ## windows系统利用vscode从Github云同步在Ubuntu系统中上云的文件，实现windows系统和Ubuntu系统的数据同步
-1. 在桌面打开Git Bash终端。先配置电脑用户和Github用户，![alt text](.assets_IMG/linux复习/image-104.png)。
-2. 打开一个想要同步文件的仓库，复制该仓库的Url。![alt text](.assets_IMG/linux复习/image-105.png)。在终端输入git clone <复制的Url>。回车，即可在桌面得到仓库中的所有文件。此后只需要在linux端拉取仓库中的新内容即可。
+1. 打开一个想要同步文件的仓库，复制该仓库的Url。![alt text](.assets_IMG/linux复习/image-105.png)。在终端输入git clone <复制的Url>。回车，即可在桌面得到仓库中的所有文件。此后只需要在linux端拉取仓库中的新内容即可。
 ## linux系统使用git教程的一些说明
 ## 管道命令
 + 简单来说，Linux中管道的作用是将上一个命令的输出作为下一个命令的输入，像pipe一样将各个命令串联起来执行，管道的操作符是`|`。
@@ -671,3 +702,7 @@
 4. 将sh test.sh任务放到后台，并将打印的日志输出到`nohup.out`文件中，终端不再能够接收任何输入（标准输入）：  nohup sh test.sh  &
 5. 将sh test.sh任务放到后台，并将打印的日志输出到test.out文件中，终端不再能够接收任何输入（标准输入）:  nohup sh test.sh >> test.out  &
 6. 将sh test.sh任务放到后台，并将打印的日志输出到nohup.out文件中，终端能够接收任何输入:  nohup sh test.sh  &
+## 在windows系统上通过mobaXterm连接linux系统
+1. 进入官网下载mobaXterm
+2. 解压后双击打开，点击servers
+3. 输入要连接客户端的IP地址和用户名即可连接成功

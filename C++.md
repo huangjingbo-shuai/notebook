@@ -137,7 +137,7 @@
 ### 引用的基本使用
 1. 作用：给变量起别名
 2. 语法：数据类型 &别名 = 原名
-3. 优点：可以简化指针修改实参
+3. 00000000优点：可以简化指针修改实参
 ## 菱形继承
 菱形继承概念：  
 1. 两个派生类继承同一个基类
@@ -231,10 +231,9 @@
 3. 函数模板也可以发生重载
 4. 如果函数模板可以产生更好的匹配，优先调用函数模板
 5. 实例：
-
-        ![alt text](.assets_IMG/C++/image-134.png)
-        ![alt text](.assets_IMG/C++/image-135.png)
-        注意：既然提供了函数模板，最好就不要提供普通函数，否则容易出现二义性
+    ![alt text](.assets_IMG/C++/image-134.png)
+    ![alt text](.assets_IMG/C++/image-135.png)
+    注意：既然提供了函数模板，最好就不要提供普通函数，否则容易出现二义性
 ## 模板的局限性
 1. 局限性：模板的通用性并不是万能的  例如：![alt text](.assets_IMG/C++/image-136.png)  再例如：![alt text](.assets_IMG/C++/image-137.png)
 2. ![alt text](.assets_IMG/C++/image-138.png)
@@ -390,12 +389,11 @@ string和char*区别：
 1. ![alt text](.assets_IMG/C++/image-200.png)
 2. ![alt text](.assets_IMG/C++/image-201.png)
 3. 总结：  
-
-        + 尾插——push_back
-        + 尾删——pop_back
-        + 插入——insert（位置迭代器）
-        + 删除——erase（位置迭代器）
-        + 清空——clear
+  + 尾插——push_back
+  + 尾删——pop_back
+  + 插入——insert（位置迭代器）
+  + 删除——erase（位置迭代器）
+  + 清空——clear
 ## vector容器数据储存
 1. ![alt text](.assets_IMG/C++/image-202.png)
 2. ![alt text](.assets_IMG/C++/image-203.png)
