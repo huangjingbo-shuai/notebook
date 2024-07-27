@@ -639,3 +639,62 @@ string和char*区别：
 2. ![alt text](.assets_IMG/C++/image-304.png)
 3. 在sort算法（）中的第三个位置是可以规定其算法规则的。
 4. ![alt text](.assets_IMG/C++/image-305.png)
+## 算术仿函数
+1. ![alt text](.assets_IMG/C++/image-306.png) 
+2. ![alt text](.assets_IMG/C++/image-307.png)
+3. 总结：  使用内建函数对象时，需要引入头文件`#include<functional>`
+## 关系仿函数
+1. ![alt text](.assets_IMG/C++/image-308.png)
+2. 总结：  关系仿函数中最常用的就是greater<>大于，这样就可以不用自己重载括号，不用自己写仿函数。
+## 逻辑仿函数
+1. ![alt text](.assets_IMG/C++/image-309.png)
+2. 总结： 在实际开发中基本用不到，了解即可。
+## 遍历算法
+1. ![alt text](.assets_IMG/C++/image-310.png)
+2. for_each在实际开发中是最常用的遍历算法，需要熟练掌握。
+## transform
+1. ![alt text](.assets_IMG/C++/image-311.png)
+2. ![alt text](.assets_IMG/C++/image-312.png)
+3. 总结：  搬运的目标容器必须要提前开辟空间，否则无法正常搬运
+## 常用的查找算法
+1. ![alt text](.assets_IMG/C++/image-313.png)
+2. ![alt text](.assets_IMG/C++/image-314.png)
+3. 总结：  利用find可以在容器中找指定的元素，返回值是迭代器。  注意：如果是查找自定义类型，一定要重载等号，不然find底层无法识别怎么样才是相等。
+## find_if
+1. ![alt text](.assets_IMG/C++/image-315.png)
+## adjacent算法
+1. ![alt text](.assets_IMG/C++/image-316.png)
+2. ![alt text](.assets_IMG/C++/image-317.png)
+## binary_search
+1. ![alt text](.assets_IMG/C++/image-318.png)
+## count
+1. ![alt text](.assets_IMG/C++/image-319.png)
+2. ![alt text](.assets_IMG/C++/image-320.png)
+![alt text](.assets_IMG/C++/image-321.png)
+## 常用的排序算法
+1. ![alt text](.assets_IMG/C++/image-322.png)
+2. sort  ![alt text](.assets_IMG/C++/image-323.png)  ![alt text](.assets_IMG/C++/image-324.png)
+3. random_shuffle  ![alt text](.assets_IMG/C++/image-325.png)  洗牌，启动！！！洗牌算法比较常用，使用时记得加随机数种子，否则就会按照伪随机数打乱。
+4. merge  ![alt text](.assets_IMG/C++/image-326.png)  ![alt text](.assets_IMG/C++/image-327.png)  merge合并的两个容器必须是有序序列
+5. reverse   类似python中的reverse=True；  ![alt text](.assets_IMG/C++/image-328.png)
+## 常用的拷贝和替换算法
+1. ![alt text](.assets_IMG/C++/image-329.png)
+2. copy  ![alt text](.assets_IMG/C++/image-330.png)   ![alt text](.assets_IMG/C++/image-331.png)
+3. replace  ![alt text](.assets_IMG/C++/image-332.png)   ![alt text](.assets_IMG/C++/image-333.png)
+4. 总结：  replace会替换区间内满足条件的元素
+5. ![alt text](.assets_IMG/C++/image-334.png)
+## accumulate
+1. ![alt text](.assets_IMG/C++/image-335.png)
+2. ![alt text](.assets_IMG/C++/image-336.png)
+3. ![alt text](.assets_IMG/C++/image-337.png)  先写迭代器，然后是起始值。
+4. 总结：  accumulate使用时头文件是numeric，这个算法很实用。
+## fill
+1.  ![alt text](.assets_IMG/C++/image-339.png)
+2. ![alt text](.assets_IMG/C++/image-338.png)
+3. 总结：  利用fill可以将容器区间内元素填充为指定值。
+## 常用的集合算法
+1. ![alt text](.assets_IMG/C++/image-340.png)
+2. 交集  ![alt text](.assets_IMG/C++/image-341.png)
+3. 并集  ![alt text](.assets_IMG/C++/image-342.png)   ![alt text](.assets_IMG/C++/image-343.png)
+4. 差集  ![alt text](.assets_IMG/C++/image-344.png)  
+5. ![alt text](.assets_IMG/C++/image-345.png)
