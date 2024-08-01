@@ -686,7 +686,7 @@
 点击New SSH key![alt text](.assets_IMG/linux复习/image-97.png)。输入好Title（随意输入）后在key框中粘贴刚才得到的密钥。
 1. 至此，密钥的配对已经完成。
 2. 我们打开任意文件夹，在文件夹下建立一个 测试文件，内容暂时随意写入。![alt text](.assets_IMG/linux复习/image-99.png)
-3. 然后在当前文件夹打开Git Bash，在终端输入git init，初始化一个空的本地仓库。接着终端输入git add .  将该文件夹中所有的文件上传至临时仓库，输入git commit,将文件上传至本地仓库。
+3. 然后在当前文件夹打开Git Bash，在终端输入git init，初始化一个空的本地仓库。接着终端输入git add .  将该文件夹中所有的文件上传至临时仓库，输入git commit -m“备注”,将文件上传至本地仓库。
 4. 进入GitHub，新建一个仓库。![alt text](.assets_IMG/linux复习/image-100.png)。输入好name以后直接点击Create repository。创建一个新的仓库。
 5. ![alt text](.assets_IMG/linux复习/image-101.png)。按照顺序，以此在终端复制进这三条指令。![alt text](.assets_IMG/linux复习/image-102.png)显示同步成功
 6.  打开Github，刷新，![alt text](.assets_IMG/linux复习/image-103.png)，我们发现文件已经顺利上传至Github云端。
