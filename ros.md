@@ -191,4 +191,59 @@
 ![alt text](.assets_IMG/ros/image-65.png)
 #### 文件标签group
 ![alt text](.assets_IMG/ros/image-66.png)
-#### 文件标签arg
+## rosbag
+1. ![alt text](.assets_IMG/ros/image-67.png)
+2. ![alt text](.assets_IMG/ros/image-68.png)
+        + -a：all，订阅所有话题消息
+        + -o：out，输出文件，设置输出路径
+## rqt工具箱
+1. ![alt text](.assets_IMG/ros/image-69.png)
+2. ![alt text](.assets_IMG/ros/image-70.png)
+3. ![alt text](.assets_IMG/ros/image-71.png)
+4. ![alt text](.assets_IMG/ros/image-72.png)
+5. ![alt text](.assets_IMG/ros/image-73.png)
+# 机器人仿真系统
+## URDF集成与Rviz的基本流程
+1. 实现流程：
+
+        + 1.准备：新建功能包，导入依赖
+        + 2. 核心：编写urdf文件
+        + 3. 核心：在launch文件集成URDF与Rviz
+        + 4. 在Rviz中显示机器人模型
+2. 创建功能包，导入依赖
+
+    ![alt text](.assets_IMG/ros/image-74.png)
+3. 编写URDF文件
+
+    ![alt text](.assets_IMG/ros/image-75.png)
+4. 在 launch 文件中集成 URDF 与 Rviz
+
+    ![alt text](.assets_IMG/ros/image-76.png)
+5. 优化启动Rviz
+
+    ![alt text](.assets_IMG/ros/image-78.png)
+## URDF link语法详解
++ ![alt text](.assets_IMG/ros/image-79.png)
+1. robot标签
+    
+    ![alt text](.assets_IMG/ros/image-80.png)
+2. link标签
++ urdf 中的 link 标签用于描述机器人某个部件(也即刚体部分)的外观和物理属性，比如: 机器人底座、轮子、激光雷达、摄像头...每一个部件都对应一个 link, 在 link 标签内，可以设计该部件的形状、尺寸、颜色、惯性矩阵、碰撞参数等一系列属性。
++ ![alt text](.assets_IMG/ros/image-81.png)
+1. 属性：name ---> 为连杆命名
+2. 子标签：
+
+    ![alt text](.assets_IMG/ros/image-82.png)
+### link标签的使用
+![alt text](.assets_IMG/ros/image-83.png)
+### URDF语法详解03_joint
++ urdf 中的 joint 标签用于描述机器人关节的运动学和动力学属性，还可以指定关节运动的安全极限，机器人的两个部件(分别称之为 parent link 与 child link)以"关节"的形式相连接，不同的关节有不同的运动形式: 旋转、滑动、固定、旋转速度、旋转角度限制....,比如:安装在底座上的轮子可以360度旋转，而摄像头则可能是完全固定在底座上。  
+
+    joint标签对应的数据在模型中是不可见的
++ ![alt text](.assets_IMG/ros/image-84.png)
++ ![alt text](.assets_IMG/ros/image-85.png)
+## xacro
++ ![alt text](.assets_IMG/ros/image-86.png)
++ ![alt text](.assets_IMG/ros/image-87.png)
++ ![alt text](.assets_IMG/ros/image-88.png)
++ 
