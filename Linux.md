@@ -917,3 +917,8 @@ eg:`ssh -X ldz@192.168.0.1`
 1. 进入官网下载mobaXterm
 2. 解压后双击打开，点击servers
 3. 输入要连接客户端的IP地址和用户名即可连接成功
+## github上开展团队协作的操作指引
++ 引言：由于无人艇入坞项目需要构建一个复杂的控制系统，所以代码这一部分的任务就特别重，我们就想三个人同时在github上共同开发，分别是我、帅华飞、徐明、宋灿灿主要参与，下面具体介绍如何创建团队协作。
+        1. 登陆github，然后进入要共同开发的项目，这里以我的notebook为例
+        2. 点击Collaborators，操作如图所示。![alt text](.assets_IMG/Linux/image-96.png)
+        3. 最后点击`Add people`把要加入的团队协作的人员加入就行了，操作如图所示。![alt text](.assets_IMG/Linux/image-97.png)
