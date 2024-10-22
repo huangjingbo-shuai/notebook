@@ -913,12 +913,69 @@ eg:`ssh -X ldz@192.168.0.1`
 4. 将sh test.sh任务放到后台，并将打印的日志输出到`nohup.out`文件中，终端不再能够接收任何输入（标准输入）：  nohup sh test.sh  &
 5. 将sh test.sh任务放到后台，并将打印的日志输出到test.out文件中，终端不再能够接收任何输入（标准输入）:  nohup sh test.sh >> test.out  &
 6. 将sh test.sh任务放到后台，并将打印的日志输出到nohup.out文件中，终端能够接收任何输入:  nohup sh test.sh  &
+# 日常笔记
 ## 在windows系统上通过mobaXterm连接linux系统
 1. 进入官网下载mobaXterm
 2. 解压后双击打开，点击servers
 3. 输入要连接客户端的IP地址和用户名即可连接成功
 ## github上开展团队协作的操作指引
 + 引言：由于无人艇入坞项目需要构建一个复杂的控制系统，所以代码这一部分的任务就特别重，我们就想三个人同时在github上共同开发，分别是我、帅华飞、徐明、宋灿灿主要参与，下面具体介绍如何创建团队协作。
++ 解决办法：
         1. 登陆github，然后进入要共同开发的项目，这里以我的notebook为例
         2. 点击Collaborators，操作如图所示。![alt text](.assets_IMG/Linux/image-96.png)
         3. 最后点击`Add people`把要加入的团队协作的人员加入就行了，操作如图所示。![alt text](.assets_IMG/Linux/image-97.png)
++ 注意：如果出现报错![alt text](.assets_IMG/Linux/image-98.png)。
+        1. 第一可能是网络问题，如果排除网络问题更可能是证书问题，系统可能缺少正确的根证书，导致TLS连接无法验证。
+        2. 解决办法是用命令`sudo apt-get install --reinstall ca-certificates`，更新证书后即可正常拉取和推送。
+## 配置科学上网
+这里不适用clash for windows，使用clash内核上网，在其他电脑上通过网页显示clash ui。具体步骤如下：
+1. 在其他电脑上ssh连接nano板
+2. `sudo su root`，因为下面很多地方需要root权限，直接切换到root用户
+3. `uname -m`，查看系统架构，如果返回的是aarch64，就使用clash-linux-arm64-latest.gz这个版本的core，如果返回x86_64，就使用clash-linux-amd64-latest.gz这个版本的core。下载源[GitHub网址](https://github.com/szkzn/Clash_Core_Latest_Bak_2023-09-05.git)
+4. `mkdir /opt/clash && cd /opt/clash`，将对应版本的core，通过ssh复制到板载计算机/opt/clash的文件夹中
+5. `gunzip clash-linux-arm64-latest.gz`，解压缩
+6. `chmod +x clash-linux-arm64-latest`，添加可执行权限
+7. `mv clash-linux-arm64-latest clash`，将文件重命名，名字太长
+8. 以上clash已经可以运行，但是需要配置文件，没有配置文件，就只是clash运行，但是没有节点。配置文件可以从主机的Linux端的clash获取，通过如下图所示方式获取，并将其移动到小电脑的`/opt/clash/`目录下
+9. `./clash -f 1705112484308.yml`，此时就可以直接运行了
+10. 但是上述运行过程过于复杂，可以将其简化为一个系统命令
+11. `mv 1705112484308.yml config.yaml`，先将1705112484308.yml文件重命名
+12. `vim /etc/systemd/system/clash.service`，clash.service的内容为
+   ```txt
+   [Unit]
+   Description=clash-core
+   [Service]
+   Type=simple
+   ExecStart=/opt/clash/clash -f /opt/clash/config.yaml
+   ```
+13. `systemctl daemon-reload`，重新加载 Systemd 的配置文件
+14. `systemctl start clash`，启动clash
+15. `systemctl status clash`，查看clash状态，可以发现已经启动
+16. 但是此时终端`curl -i google.com`还是无法连通
+17. `vim ~/.bashrc`，这里是直接在root目录下的.bashrc中修改，在最一开始添加
+18. `source ~/.bashrc`，刷新环境变量
+19. `proxy`，运行在.bashrc文件中定义的指令名
+20. `curl -i google.com`，此时可以发现google可以ping通
+21. 以上可以实现，在终端中输入`proxy`，就可以在终端科学上网，在终端中输入`unproxy`，就可以在终端停止科学上网。然后可以退出root用户，将当前用户的.bashrc文件中也加上那两行，这样不论是普通用户还是root用户都可以科学上网。然后再切换至root用户。但是上述方式目前为止，只能在终端查看clash的状态`systemctl status clash`，最好能有个ui，下面的步骤将介绍如何在同局域网的其他计算机的浏览器中查看clash状态。
+        + 注意：有的时候做完上述操作还是没办法ping通Google，这个时候不妨重启一下小电脑，断电，待10秒钟以后插上电重新试一试。上次因为这个问题找了好久都找不到，最后心态小崩直接重启发现竟然可以ping通了。
+22. [下载](https://gitlab.com/accessable-net/clash-dashboard/-/tree/gh-pages?ref_type=heads)ui相关的zip。
+23. `mkdir /opt/clash/ui && cd /opt/clash/ui`，在Linux端新建一个目录/opt/clash/ui
+24. 将下载好的zip文件移动到Linux端的目录/opt/clash/ui中，或者复制下载链接，在终端中执行`wget 下载链接`直接下载也可以
+25. 下载后使用unzip解压。解压后，将压缩文件删除，并将解压出来的文件夹中的文件都移出来`mv clash-dashboard-gh-pages/* .`。并退回到/opt/clash目录中`cd ..`
+26. `vim config.yaml`，在config.yaml文件中添加一行，使其指向`ui/index.html`这个文件，这样才能在网页中看到。添加的一行为`external-ui: /opt/clash/ui`，位置如图中红框所示。还需修改一行，否则无法从其他计算机浏览器访问这个网页，修改处如图中绿框中所示，将其中的127.0.0.1修改为0.0.0.0。
+27. 修改完成后保存，并`systemctl restart clash`重启clash。重启后可`systemctl status clash`，查看clash状态
+28. 重启完成后在同局域网的其他计算机的浏览器中输入该Linux端的IP地址加端口号，`192.168.1.107:9090/ui`，即可看到clash的ui，可在其中选择节点。如果此时跳出来一个界面，输入Linux端的IP地址即可。
+### Jeston Nano启动clash
+1. 如何启动和关闭clash
+   ```bash
+   # 启动clash
+   sudo systemctl start clash
+   # 查看clash状态，是否被启动
+   sudo systemctl status clash
+   # 在终端环境变量中定义的变量，终端可上网
+   proxy
+   # 在终端环境变量中定义的变量，终端关闭上网
+   unproxy
+   # 关闭clash
+   sudo systemctl stop clash
+   ```
