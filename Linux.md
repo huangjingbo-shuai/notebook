@@ -979,5 +979,3 @@ eg:`ssh -X ldz@192.168.0.1`
    # 关闭clash
    sudo systemctl stop clash
    ```
-
-123
