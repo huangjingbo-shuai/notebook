@@ -967,7 +967,7 @@ eg:`ssh -X ldz@192.168.0.1`
 28. 重启完成后在同局域网的其他计算机的浏览器中输入该Linux端的IP地址加端口号，`192.168.1.107:9090/ui`，即可看到clash的ui，可在其中选择节点。如果此时跳出来一个界面，输入Linux端的IP地址即可。
 ### Jeston Nano启动clash
 1. 如何启动和关闭clash
-   ```bash
+   ```bashs
    # 启动clash
    sudo systemctl start clash
    # 查看clash状态，是否被启动
@@ -979,3 +979,5 @@ eg:`ssh -X ldz@192.168.0.1`
    # 关闭clash
    sudo systemctl stop clash
    ```
+## 关于分布式操作的问题
+1. 有一天发现分布式配置了以后想回到分布式以前的状态，发现修改了环境变量并刷新环境变量还是没办法正常roscore，最后发现原因是source命令可能不起作用，需要重新关闭黑窗口重新打开，问题即可解决。有时候大部分办法都解决不了的问题，可能重启一次就可以解决了。
