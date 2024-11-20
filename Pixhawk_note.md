@@ -316,3 +316,30 @@
 ![alt text](.assets_IMG/Pixhawk_note/image-57.png)  
 nano板的引脚图如下。红框中的为使用到的串口引脚。并注意对应串口号为`/dev/ttyTHS1`  
 ![alt text](.assets_IMG/Pixhawk_note/image-65.png)  
+# PX4代码Rover机架的逻辑整理
+## Rover机架的混合器输出
+1. ![alt text](.assets_IMG/Pixhawk_note/image-66.png)，进入mix的定义
+2. ![alt text](.assets_IMG/Pixhawk_note/image-67.png)，这里发现是指针mixer调用了mix，而mixer又在遍历_mixers，进入_mixers
+3. ![alt text](.assets_IMG/Pixhawk_note/image-68.png)，发现_mixers源自Mixer这个容器，同时他也是一个类，再进入Mixer的定义中。
+4. 由于是mixer调用了mix，而mixer又源自Mixer这个类，所以我们应该在Mixer这个类里面找mix这个函数，这里我们再Mixer中搜索mix。![alt text](.assets_IMG/Pixhawk_note/image-69.png)
+5. 发现这个mix函数是一个虚函数，所以我们猜测肯定是有Mixer的子类在重写这个函数，但是线索好像又在这里断了。此时我们可以在左侧搜索栏搜索mix，注意要完整搜索，看看是谁在重写这个mix函数。根据搜索结果我们发现，有好几种混合器重写了这个函数，但我们综合来看，差速车一般都是简单混合器的控制（这里的出处可以询问chatgpt），所以我们半信半疑定位到SimpleMixer.cpp这个文件。![alt text](.assets_IMG/Pixhawk_note/image-70.png)
+6. ![alt text](.assets_IMG/Pixhawk_note/image-71.png)进去以后发现在这里的sum++确实是在做混合，这就是所谓的简单混合器控制。但这个地方的mix函数是否就是Mixergroup的mix函数呢？我们暂时不知道。![alt text](.assets_IMG/Pixhawk_note/image-72.png)
+7. 好像线索到这里就断了。那我们回头，回到mix_module.cpp中，最开始，我们是_mixer调用了mix，那我这一条线找不下去了我们能不能换一条线呢？我们这里看看_mixers还做了什么操作，回到mix_module.cpp中搜索_mixers，发现这个地方很重要，很有可能有猫腻。![alt text](.assets_IMG/Pixhawk_note/image-73.png)
+8. 从他的名字我们可以推测他可能是加载什么东西，我们点进去看看。发现这里就有我们上面定位的SimpleMixer控制器，这里我们先默认他就是加载的这个控制器，后期再补充这是为什么。![alt text](.assets_IMG/Pixhawk_note/image-74.png)
+9. 定位到这里以后，我们看看from_text里面写的是什么，点进去后发现这个函数返回的是sm，而这个sm又new了一个SimpleMixer，![alt text](.assets_IMG/Pixhawk_note/image-75.png)。这个时候我们更加确定就是_mixer加载了这个SimpleMixer简单混合器。
+10. 好到这里我们已经确定了mix_module中的mix函数就是SimpleMixer中的mix函数了。此时我们来仔细解析一下这个mix函数在写什么。
+11. ![alt text](.assets_IMG/Pixhawk_note/image-76.png)，我们发现这里有一个回调函数，那么这个回调函数是从哪里传进来的呢？我们一般可以把他看成一个变量，我们一般要回到构造函数中寻找，我们翻到最前面，![alt text](.assets_IMG/Pixhawk_note/image-77.png)，发现真的是在SimpleMixer的构造函数中传进去的，然后再通过列表传给Mixer的构造函数。这样一来，我们在Mix_module.cpp中调用了SimpleMixer中的mix![alt text](.assets_IMG/Pixhawk_note/image-78.png)。并且SimpleMixer触发这个回调函数来更新yaw和推力值。
+## Rover机架的PWM波输出逻辑整理
+1. ![alt text](.assets_IMG/Pixhawk_note/image-79.png)我们找到控制Rover的源码，找到姿态控制部分，如图所示，发现我们的推力值实际上就存在_act_controls这个变量中，我们点进去看看。
+2. 点进去发现他是源自一个结构体，而这个结构体我们又发现他发布出去了，进而我们可以根据找他的订阅号去寻找到底是谁订阅了这个消息。我们在左侧搜索这个订阅号。![alt text](.assets_IMG/Pixhawk_note/image-80.png)发现Mix_module订阅了，我们点进去看。
+3. 发现订阅的这个数据传进了_control_subs这个函数中，那这里只是这个函数的声明，并没有实现，我们往下翻找他的实现，再翻找的过程中我们发现前面四个都不是很重要的调用，我们找到最后一个。![alt text](.assets_IMG/Pixhawk_note/image-81.png)发现他被复制给了_controls
+4. 但此时我们发现这个for循环里面好像只是跟电调的标定有关，并没有什么特别有用信息，但是我们唯一可以确定的他在这个大函数里面。![alt text](.assets_IMG/Pixhawk_note/image-82.png)
+5. 那谁调用的他呢？在这个文件里搜一下，发现这里在调用。![alt text](.assets_IMG/Pixhawk_note/image-83.png)
+6. 那update又是谁在调用呢？文件里搜不到，我们在左边搜，搜.update()，因为方法要么是被点出来的要么就是被静态加载的。![alt text](.assets_IMG/Pixhawk_note/image-84.png)
+7. 我们发现这里PWM_Output调用了，我们点进去看看![alt text](.assets_IMG/Pixhawk_note/image-85.png)发现确实是被PWM_Output调用了。我们点进去_mixing_output的定义发现里面是一个构造函数，好像没什么用，此时又卡住了，线索又断了。![alt text](.assets_IMG/Pixhawk_note/image-86.png)
+8. 那我们回头，回到PWM_Out.cpp中，寻找到底哪一部分跟更新PWM波有关。发现updateOutputs是最相关的。![alt text](.assets_IMG/Pixhawk_note/image-87.png)
+9. 那是谁在调用它的呢？我们在当前文件中搜不到，推测就是在外部调用的，在左侧搜，![alt text](.assets_IMG/Pixhawk_note/image-88.png)发现mixer_module最有可能调用了。
+10. 进去mixer_module发现这个updateOutputs是_interface中的方法，我们进去看这个对象是哪里来的，发现他是在OutputModuleInterface这个类里的。![alt text](.assets_IMG/Pixhawk_note/image-89.png)
+11. 那这个类里面又是什么呢？![alt text](.assets_IMG/Pixhawk_note/image-90.png)发现这里面的Outputupdate是一个虚函数，那我们就会推测mixer_module中的updateOutputs到底是不是PWMOut中的pdateOutputs呢？此时线索好像又断了。
+12. 那我们就要看是谁传进来的这个_interface就能确定。我们回到构造函数，mix_module的最上面![alt text](.assets_IMG/Pixhawk_note/image-91.png)，发现确实传了一个interface进来，而这个interface就是构造函数里面的interface![alt text](.assets_IMG/Pixhawk_note/image-92.png)
+13. 而这个interface又是这个写了虚函数的类里面的，此时我们想到一开始![alt text](.assets_IMG/Pixhawk_note/image-93.png)PWMOut是OutputModuleInterface的子类，他在MixingOutput这个类的构造函数里把自己传进去了，也就是说是PWMOut重写了接口类里面的Outputupdate函数。这样混合器里面就能已知更新PWM波的输出了。

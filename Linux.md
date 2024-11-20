@@ -981,3 +981,23 @@ eg:`ssh -X ldz@192.168.0.1`
    ```
 ## 关于分布式操作的问题
 1. 有一天发现分布式配置了以后想回到分布式以前的状态，发现修改了环境变量并刷新环境变量还是没办法正常roscore，最后发现原因是source命令可能不起作用，需要重新关闭黑窗口重新打开，问题即可解决。有时候大部分办法都解决不了的问题，可能重启一次就可以解决了。
+## 卸载mavros并源码安装
+1. 卸载mavros：`sudo apt-get remove ros-noetic-mavros ros-noetic-mavros-extras`
+2. 源码安装mavros，参考链接`https://docs.px4.io/main/en/ros/mavros_installation.html`
+3. 首先检查一下home目录下是否有.catkin_tools文件夹，如果有，就删除，否面后面编译时会报类似下面的错：`[build] Error: Unable to find source space /home/amov/src`
+4. 然后新建工作空间，名称可以自己任取`mkdir -p ~/catkin_ws/src`,`cd ~/catkin_ws`,`catkin init`,`wstool init src`
+5. 安装ROS Python工具` sudo apt-get install python-catkin-tools python-rosinstall-generator -y`
+6. 初始化源码空间` wstool init ~/catkin_ws/src`
+7. 注意，后面的操作都在catkin_ws目录下执行,执行下面语句安装mavlink`rosinstall_generator --rosdistro melodic mavlink | tee /tmp/mavros.rosinstall`,成功后如下：![alt text](.assets_IMG/Linux/image-99.png)
+8. 执行下面两条语句的其中一条安装mavros:
+        + 稳定版mavros`rosinstall_generator --upstream mavros | tee -a /tmp/mavros.rosinstall`
+        + 最新版mavros`rosinstall_generator --upstream-development mavros | tee -a /tmp/mavros.rosinstall`
+        + 成功后如下：![alt text](.assets_IMG/Linux/image-100.png)
+9. 执行`wstool merge -t src /tmp/mavros.rosinstall`,执行过程中输入y，成功后如下：![alt text](.assets_IMG/Linux/image-101.png)
+10. 执行下面语句下载源码`wstool update -t src -j4`，成功后如下：![alt text](.assets_IMG/Linux/image-102.png)
+11. 执行`rosdep install --from-paths src --ignore-src -y`,成功后如下：![alt text](.assets_IMG/Linux/image-103.png)
+12. 执行`sudo ./src/mavros/mavros/scripts/install_geographiclib_datasets.sh`
+13. 成功后如下：![alt text](.assets_IMG/Linux/image-104.png)
+14. 执行`catkin build`,![alt text](.assets_IMG/Linux/image-105.png)
+15. 最后执行`source devel/setup.bash`，把这个放进`.bashrc`中，`roscd mavros`如果安装mavros安装成功的话，显示如下：![alt text](.assets_IMG/Linux/image-106.png)
+16. 总结，这是再不需要仿真环境下的mavros安装，如果需要仿真环境的话还需要更多操作，详细操作参考上面链接`https://blog.csdn.net/qq_38768959/article/details/106041494?ops_request_misc=%257B%2522request%255Fid%2522%253A%252290337672-42C1-4015-95D2-8962DEBA58D6%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&request_id=90337672-42C1-4015-95D2-8962DEBA58D6&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-11-106041494-null-null.nonecase&utm_term=%E4%BB%8E%E6%94%BE%E5%BC%83%E5%88%B0%E7%B2%BE%E9%80%9A&spm=1018.2226.3001.4450`
