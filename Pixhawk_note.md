@@ -277,11 +277,16 @@
 
 # 仿真与实物怎么通过ros结合
 控制节点对仿真中飞机的控制和实物的控制方式一样，结果也应该差不多，所以代码其实是一样的，不同的是启动仿真与启动实物的方式不同。QGC同理，飞控路径的设置方式都是一样的，只是启动仿真与启动实物的方式不同。
+## 安装仿真环境
+1. 参考超维空间的博客，这个教程非常的详细，具体链接参考`https://mbot1.blog.csdn.net/article/details/106041494`
 ## 启动仿真
 1. 刷新环境变量
 2. `roslaunch px4 mavros_posix_sitl.launch`，启动gazebo仿真，这里启动的是`mavros_posix_sitl.launch`文件，会自动启动mavros，并且gazebo中的模型默认是四旋翼，可以通过在命令行中指定变量的方式更改模型，如`roslaunch px4 mavros_posix_sitl.launch vehicle:=rover`，就将gazebo中的模型修改成了小车
 3. 启动运动控制节点(节点中注意要有切offboard模式和解锁的过程)
 4. 仿真中的飞机自动运行控制逻辑
+5. 如果要进入海洋仿真环境，需要修改`/home/yunxia/PX4-Autopilot/launch/mavros_posix_sitl.launch`中的`world`参数，将`empty`改成boat，再重新编译，注意，这里要用`make px4_sitl_default gazebo_boat`编译，如果用`make px4_sitl_default gazebo`会默认编译陆地环境。
+6. 但是这个地方会报错超时，此时我们要把同步锁关闭，将`/home/yunxia/PX4-Autopilot/Tools/sitl_gazebo/models/boat/boat.sdf`的`enable_lockstep`参数改成`false`。
+7. 禁用同步锁教程参考链接`https://docs.px4.io/v1.12/en/simulation/`
 ## 启动实物
 1. 使能串口权限`sudo chmod 777 /dev/ttyTHS1`
 2. 选择好定点方式，对于目前我手头上的无人机(T265定位)，如果是通过视觉定点，`roslaunch px4_realsense_bridge bridge_mavros.launch`(启动mavros和相机)，如果是GPS定点，`roslaunch px4_realsense_bridge bridge_mavros_gps.launch`(其实本质上就是启动了mavros，这个bridge_mavros_gps.launch文件是我放在realsense_ros_ws/src/VIO/launch文件夹中的，主要是为了启动方便，并且与bridge_mavros.launch对比方便)

@@ -50,3 +50,21 @@
 + 参考博客`https://blog.csdn.net/qq_38768959/article/details/131133686`
 ### 多机仿真
 1. 参考博客`https://blog.csdn.net/qq_38768959/article/details/131133686`
+
+
+## APM实物上手
++ 想顺利的用APM固件控制电机有以下需要注意的点
+1. APM的电机通道是通道1和通道3，而PX4的电机通道是通道1和通道2
+2. 校准APM的时候涉及到遥控器的校准，但是在QGC地面站上校准APM的遥控器似乎有bug，只要碰到右下角或者左下角的校准就没反应了，根本无法校准。解决办法是用`Mission Planner`地面站校准遥控器，而其他的不变可以继续用QGC地面站，因为MP地面站太丑了，不想用。MP地面站的安装见下面的教程。
+3. 进入地面站以后，要先点击右上角的连接，和飞控建立连接。
+4. 连接好飞控以后点击初始设置，找到必选硬件，找到遥控器校准，即可进行遥控器的校准。
+5. 校准好遥控器以后还是打开QGC地面站观察，尝试解锁，发现报错`Hardware safety switch`，这是因为APM固件在解锁之前需要按下飞控上的物理按钮，在飞控的右边有一个小按钮。为了以后的使用方便，我们把这个选项禁用掉。在QGC地面站的参数搜索`BRD_SAFETYDEFLT`，将这个参数改成0即可。![alt text](.assets_IMG/APM入门/image-9.png)，![alt text](.assets_IMG/APM入门/image-10.png)
+6. 禁用完以后发现还是解锁不了，报错`Arm: Throttle (RC3) is not neutral`，这是因为还要配置遥控器油门通道（RC3）的中立值参数，将参数`RC3_TRIM`改成1500。在某些需要偏中立油门的模式（如中性点在中间）中，RC3_TRIM会设置为1500（通常是中间位置）。
+7. 再解锁，成功启动电机。
+8. 注意，此时要注意观察电机的正反转，以及遥控器的通道设置，检查修改即可，这个很简单。
+
+## MP地面站的安装
+1. `Mission Planner`可以在官网免费下载，`https://firmware.ardupilot.org/Tools/MissionPlanner/MissionPlanner-latest.msi`
+2. 下载好以后解压，注意要提取到一个文件夹里，不然根目录下就会多出几百个文件和文件夹，非常乱。
+3. 解压好以后需要安装Mono包。`sudo apt update`，`sudo apt install mono-complete`，运行以下命令查看是否安装成功`mono --version` ，![alt text](.assets_IMG/APM入门/image-8.png)
+4. 进入`/MissionPlanner-latest`文件夹，运行指令`mono MissionPlanner.exe`,即可打开MP地面站
