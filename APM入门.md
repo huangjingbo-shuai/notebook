@@ -62,9 +62,32 @@
 6. 禁用完以后发现还是解锁不了，报错`Arm: Throttle (RC3) is not neutral`，这是因为还要配置遥控器油门通道（RC3）的中立值参数，将参数`RC3_TRIM`改成1500。在某些需要偏中立油门的模式（如中性点在中间）中，RC3_TRIM会设置为1500（通常是中间位置）。
 7. 再解锁，成功启动电机。
 8. 注意，此时要注意观察电机的正反转，以及遥控器的通道设置，检查修改即可，这个很简单。
+9. 在室外进行调试的时候，发现`roslaunch mavros apm.launch`无法正常启动，这是因为apm.launch中的端口默认是ACM0，且波特率默认是57600。当出现类似的问题，应该`roscd mavros`,`cd launch`,`vim apm.launch`，把端口号改为`USB0`，且波特率改为`921600`。
+10. 改完以后要与地面站的端口号的波特率一致，将参数`SERIAL2_BAUD`参数改为921600。
 
 ## MP地面站的安装
 1. `Mission Planner`可以在官网免费下载，`https://firmware.ardupilot.org/Tools/MissionPlanner/MissionPlanner-latest.msi`
 2. 下载好以后解压，注意要提取到一个文件夹里，不然根目录下就会多出几百个文件和文件夹，非常乱。
 3. 解压好以后需要安装Mono包。`sudo apt update`，`sudo apt install mono-complete`，运行以下命令查看是否安装成功`mono --version` ，![alt text](.assets_IMG/APM入门/image-8.png)
 4. 进入`/MissionPlanner-latest`文件夹，运行指令`mono MissionPlanner.exe`,即可打开MP地面站
+
+## APM仿真
++ 其实APM的仿真很简单。和实物很类似，我们只需要指定以下UDP就行了
+1. 进入bash文件关闭分布式
+2. 启动仿真，参考上面仿真的步骤
+3. 启动mavros`roslaunch mavros apm.launch fcu_url:=udp://:14550@127.0.0.1:14555`。![alt text](.assets_IMG/APM入门/image-11.png)
+
+## APM姿态控制代码的逻辑整理
+1. mavros中的`setpoint_attitude.cpp`，通过`set_attitude_target`函数转为mavlink消息发送给飞控，![alt text](.assets_IMG/APM入门/image-12.png)，具体的`set_attitude_target`函数实现是![alt text](.assets_IMG/APM入门/image-13.png)，这里转成了`SET_ATTITUDE_TARGET`的mavlink消息类型。然而这里发送是`send_message`函数发送消息。![alt text](.assets_IMG/APM入门/image-14.png),这里封装和发送MAVLink消息，它将一个MAVLink消息对象序列化为标准的MAVLink数据包，并将其转换为ROS话题消息，然后通过ROS话题发布。这里的`uint8_t src_compid`是MAVLink 消息的来源组件ID，这个ID就是mavlink不同消息包对应的ID号。
+2. 上层发送的`setpoint_attitude`消息到了APM中的Rover模块下的`GCS_Mavlink.cpp`接收，具体是在`handle_message`这个函数中处理，![alt text](.assets_IMG/APM入门/image-15.png)，这个函数会根据消息的msgid（即消息类型）决定调用相应的处理函数，这里我们调用的是情况1。也就是`handle_set_attitude_target`这个函数在处理消息。
+3. ![alt text](.assets_IMG/APM入门/image-16.png)在`handle_set_attitude_target`函数中有推力转化成速度的计算，四元数转换成姿态的计算。`set_desired_heading_and_speed`进入这个函数就来到了`Rover`模块下的`mode_guided.cpp`这个板外控制模块了。在这里会设置接收到的目标航向角和目标速度，供后续函数调用。但其实想知道这里是怎么一步步到电机的还是卡住了，所以还得找。
+4. 这个时候我就会想，这个值肯定是要实时更新的，不然他怎么持续的运作呢？这个时候就在`mode_guided.cpp`中搜`update`，发现确实有一个更新模块。而且正正好就是对不同控制器的数据更新。
+5. 我们这里是`HeadingAndSpeed`，航向角和速度子模式。这里计算转向推力是`calc_steering_to_heading`函数。![alt text](.assets_IMG/APM入门/image-17.png)
+6. 进入发现到了`mode.cpp`![alt text](.assets_IMG/APM入门/image-18.png)，在这里是将转向缩放，并设置到转向系统，![alt text](.assets_IMG/APM入门/image-19.png)。进入`set_steering`函数，![alt text](.assets_IMG/APM入门/image-20.png)。发现他是在`set_steering`函数中调用电机控制模块的。
+7. 再进入`set_steering`，![alt text](.assets_IMG/APM入门/image-21.png)，到这里好像又卡住了，就用了`_steering`，储存当前的转向值，`_scale_steering`记录是否需要对转向值应用比例缩放。
+8. 这个时候肯定是要输出PWM波的，我就在这个`AP_MotorsUGV.cpp`中搜索`Output`，发现确实是有这个`Run`函数的，![alt text](.assets_IMG/APM入门/image-22.png),这里调用不同类型的输出方法，这里我们是普通转向和油门。进入`output_regular`,![alt text](.assets_IMG/APM入门/image-23.png)。发现是在`set_output_scaled`函数中计算得到的转向值的，再进入`set_output_scaled`![alt text](.assets_IMG/APM入门/image-24.png)
+9. 进去以后发现还是没有PWM波的输出，但是有pwm波的状态更新。此时又卡住了。又回到`AP_MotorsUGV.cpp`文件，因为我们就是从这个output函数找过来的。回到这以后仔细阅读发现最后做了PWM波的更新，调用的是`SRV_Channels::calc_pwm()`方法，![alt text](.assets_IMG/APM入门/image-25.png)，进入`calc_pwm`函数中。![alt text](.assets_IMG/APM入门/image-26.png)
+10. 发现在后面的`.calc_pwm`函数计算PWM波值，将output_scaled作为输入转化为PWM波
+11. 进入`calc_pwm`函数，![alt text](.assets_IMG/APM入门/image-27.png)，发现在`pwm_from_scaled_value`做了逻辑值到PWM波的转换。![alt text](.assets_IMG/APM入门/image-28.png),进入`pwm_from_scaled_value`.
+12. 发现他只是一个判断，我们是角度类型的，返回第一个`pwm_from_angle`。进去![alt text](.assets_IMG/APM入门/image-29.png)
+13. 发现他这里就是输出PWM波的最终逻辑，问题解决，逻辑理顺。
