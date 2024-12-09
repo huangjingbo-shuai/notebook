@@ -75,9 +75,14 @@
 + 其实APM的仿真很简单。和实物很类似，我们只需要指定以下UDP就行了
 1. 进入bash文件关闭分布式
 2. 启动仿真，参考上面仿真的步骤
-3. 启动mavros`roslaunch mavros apm.launch fcu_url:=udp://:14550@127.0.0.1:14555`。![alt text](.assets_IMG/APM入门/image-11.png)
-
-## APM姿态控制代码的逻辑整理
+3. 启动mavros`roslaunch mavros apm.launch fcu_url:=udp://:14550@127.0.0.1:14555`。![alt text](.assets_IMG/APM入门/image-11.png):`错误的`。
+4. 注意，上面的3是错误的。当时没有理清楚这里的关系，教条的认为博客就是对的。其实不对。这里回环仿真相当于一个APM固件的飞控，启动回环仿真就相当于启动APM固件的飞控，但是我们的飞控要与地面站相连，还要与mavros相连，这个地方真的非常坑，他默认的只有一个端口，不分流，也就是说默认情况下，启动`roslaunch apm.launch`，默认只有一个对象可以接受这个数据流，而我们既想用地面站监控又想用mavros进行操控必须有两个数据源流，所以这个回环仿真就必须通过两个端口号来分流，使得两个端口号都可以接收他的数据。至于我是为什么发现这里我是一帧一帧找许军的教学视频看他是有几个UPD输出流的，在教学视频`https://www.bilibili.com/video/BV1gZ421h7Bt/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=9cecaf1cdbe9321fee9e510aede34abf`中的第`4：59`有一帧，看到他是两个输出流到UDP。![alt text](.assets_IMG/APM入门/image-34.png)所以这里的解决办法就是在`ardupilot/Rover`下运行指令`../Tools/autotest/sim_vehicle.py -f rover --out=udp:127.0.0.1:14550 --out=udp:127.0.0.1:14551`。
+5. 这就是为什么我一开始运行`roslaunch mavros apm.launch fcu_url:=udp://:14550@127.0.0.1:14555`有用，但是同时地面站会断开连接的原因，因为他们此时共享了一个端口的数据流，会冲突，只能有一个存在。而`apm.launch`中的`14551`会报错也是这个原因，因为`14551`压根就没有数据源流，回环是`14550`，当然会报错了。
+6. 总结，也就是说，关键是数据源流要分两个通道。地面站对应`14550`，mavros对应`14551`。
+                + 在ardupilot/Rover下启动回环仿真`../Tools/autotest/sim_vehicle.py -f rover --out=udp:127.0.0.1:14550 --out=udp:127.0.0.1:14551`
+                + 启动mavros`roslaunch apm.launch`或者`roslaunch mavros apm.launch fcu_url:=udp://:14551@127.0.0.1:14555`
+                + 再启动地面站，就可以了正常运行mavros代码进行仿真了。
+## APM无人船姿态控制代码的逻辑整理
 1. mavros中的`setpoint_attitude.cpp`，通过`set_attitude_target`函数转为mavlink消息发送给飞控，![alt text](.assets_IMG/APM入门/image-12.png)，具体的`set_attitude_target`函数实现是![alt text](.assets_IMG/APM入门/image-13.png)，这里转成了`SET_ATTITUDE_TARGET`的mavlink消息类型。然而这里发送是`send_message`函数发送消息。![alt text](.assets_IMG/APM入门/image-14.png),这里封装和发送MAVLink消息，它将一个MAVLink消息对象序列化为标准的MAVLink数据包，并将其转换为ROS话题消息，然后通过ROS话题发布。这里的`uint8_t src_compid`是MAVLink 消息的来源组件ID，这个ID就是mavlink不同消息包对应的ID号。
 2. 上层发送的`setpoint_attitude`消息到了APM中的Rover模块下的`GCS_Mavlink.cpp`接收，具体是在`handle_message`这个函数中处理，![alt text](.assets_IMG/APM入门/image-15.png)，这个函数会根据消息的msgid（即消息类型）决定调用相应的处理函数，这里我们调用的是情况1。也就是`handle_set_attitude_target`这个函数在处理消息。
 3. ![alt text](.assets_IMG/APM入门/image-16.png)在`handle_set_attitude_target`函数中有推力转化成速度的计算，四元数转换成姿态的计算。`set_desired_heading_and_speed`进入这个函数就来到了`Rover`模块下的`mode_guided.cpp`这个板外控制模块了。在这里会设置接收到的目标航向角和目标速度，供后续函数调用。但其实想知道这里是怎么一步步到电机的还是卡住了，所以还得找。
@@ -91,3 +96,17 @@
 11. 进入`calc_pwm`函数，![alt text](.assets_IMG/APM入门/image-27.png)，发现在`pwm_from_scaled_value`做了逻辑值到PWM波的转换。![alt text](.assets_IMG/APM入门/image-28.png),进入`pwm_from_scaled_value`.
 12. 发现他只是一个判断，我们是角度类型的，返回第一个`pwm_from_angle`。进去![alt text](.assets_IMG/APM入门/image-29.png)
 13. 发现他这里就是输出PWM波的最终逻辑，问题解决，逻辑理顺。
+
+## APM固件下载
+1. `https://firmware.ardupilot.org/`
+
+## APM控制无人船掩码相关整理
+1. 此次学习重点查看的代码有`mode_guided.cpp`、`GCS_Mavlink.cpp`这两段代码中和掩码相关的是`GCS_Mavlink.cpp`。其实这两段代码我每个函数都打上了注释。但是在这里面只找到`defines.h`这个头文件定义了忽略文件。对应的数字39、163、1024等等还是没找到。![alt text](.assets_IMG/APM入门/image-30.png)![alt text](.assets_IMG/APM入门/image-31.png)
+2. 这里其实有点卡住了，但是只能硬着头皮继续往后看，科研就是要耐得住寂寞对吧。当我快要看完的时候，找到`uint64_t GCS_MAVLINK_Rover::capabilities() const`这个函数，发现这里在设置某些功能，可能涉及到掩码，这里点进去`MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_LOCAL_NED`，来到了`common.h`![alt text](.assets_IMG/APM入门/image-32.png)![alt text](.assets_IMG/APM入门/image-33.png)
+3. 到了这里发现这里的`1、2、4、8、16、32、64、128`和许军写的掩码非常类似，我怀疑掩码可能就在这里设置，但是还没找到具体定义，还不敢确定。
+4. 这个时候实际上又卡了一会，我又回去翻看许军的教学视频`https://www.bilibili.com/video/BV1Hoege5EVe/?spm_id_from=333.788.top_right_bar_window_history.content.click&vd_source=9cecaf1cdbe9321fee9e510aede34abf`。发现APM有说明文档。![alt text](.assets_IMG/APM入门/image-35.png)![alt text](.assets_IMG/APM入门/image-36.png)![alt text](.assets_IMG/APM入门/image-37.png)![alt text](.assets_IMG/APM入门/image-38.png)
+5. 进去之后发现姿态控制和许军写的掩码确实一致。![alt text](.assets_IMG/APM入门/image-39.png)![alt text](.assets_IMG/APM入门/image-40.png)
+6. 其次，发现在`type_mask`这一栏有一个参数`POSITION_TARGET_TYPEMASK`，在源码左侧搜索，发现`common`中有这个选项，点进去发现就是在这里定义的掩码。![alt text](.assets_IMG/APM入门/image-41.png)
+7. 根据许军的代码，也都能对得上，其实就是要忽略什么就把什么加上去就行了。![alt text](.assets_IMG/APM入门/image-42.png)
+8. 但是姿态控制的掩码怎么都对不上。39、163都找不到缘由。但是我发现39-1-2-4=32，而且163-1-2-128=32。这里都是多了一个32。这里其实又卡了一会，但是我推测这个32可能是预留位，然后我把32减去，我只传7进去，发现效果一直，猜测验证，多加的这32就是预留位。
+9. 至此，掩码分析完毕。

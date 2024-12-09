@@ -988,7 +988,7 @@ eg:`ssh -X ldz@192.168.0.1`
 4. 然后新建工作空间，名称可以自己任取`mkdir -p ~/catkin_ws/src`,`cd ~/catkin_ws`,`catkin init`,`wstool init src`
 5. 安装ROS Python工具` sudo apt-get install python-catkin-tools python-rosinstall-generator -y`
 6. 初始化源码空间` wstool init ~/catkin_ws/src`
-7. 注意，后面的操作都在catkin_ws目录下执行,执行下面语句安装mavlink`rosinstall_generator --rosdistro melodic mavlink | tee /tmp/mavros.rosinstall`,成功后如下：![alt text](.assets_IMG/Linux/image-99.png)
+7. 注意，后面的操作都在catkin_ws目录下执行,执行下面语句安装mavlink`rosinstall_generator --rosdistro noetic mavlink | tee /tmp/mavros.rosinstall`,成功后如下：![alt text](.assets_IMG/Linux/image-99.png)
 8. 执行下面两条语句的其中一条安装mavros:
         + 稳定版mavros`rosinstall_generator --upstream mavros | tee -a /tmp/mavros.rosinstall`
         + 最新版mavros`rosinstall_generator --upstream-development mavros | tee -a /tmp/mavros.rosinstall`
@@ -1001,3 +1001,52 @@ eg:`ssh -X ldz@192.168.0.1`
 14. 执行`catkin build`,![alt text](.assets_IMG/Linux/image-105.png)
 15. 最后执行`source devel/setup.bash`，把这个放进`.bashrc`中，`roscd mavros`如果安装mavros安装成功的话，显示如下：![alt text](.assets_IMG/Linux/image-106.png)
 16. 总结，这是再不需要仿真环境下的mavros安装，如果需要仿真环境的话还需要更多操作，详细操作参考上面链接`https://blog.csdn.net/qq_38768959/article/details/106041494?ops_request_misc=%257B%2522request%255Fid%2522%253A%252290337672-42C1-4015-95D2-8962DEBA58D6%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&request_id=90337672-42C1-4015-95D2-8962DEBA58D6&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-11-106041494-null-null.nonecase&utm_term=%E4%BB%8E%E6%94%BE%E5%BC%83%E5%88%B0%E7%B2%BE%E9%80%9A&spm=1018.2226.3001.4450`
+## Intel小电脑重装Ubuntu20.04.06系统
+1. 先下载好镜像包，用32Disk把系统盘做好
+2. 小电脑开机疯狂点按`Delete`进入启动界面，选择`Setting set up`进入
+3. 在`Advance`选项的第一个启动项改成启动盘的第一个，也就是字少的那一个
+4. 选择好了以后转到`boot`点击`save changes and exit`
+5. 然后会回到启动界面，选择`Ubuntu`第一个，进入
+6. 注意，Checking完了以后不要改成中文，不然就会出现点击不了下一步的情况![alt text](.assets_IMG/Linux/image-107.png)
+7. 最好先不要联网![alt text](.assets_IMG/Linux/image-108.png)
+8. 然后选择正常安装和最后一个，安装最后一个可能会解决部分驱动和网络问题![alt text](.assets_IMG/Linux/image-109.png)
+9. 安装类型选择其他![alt text](.assets_IMG/Linux/image-111.png)
+10. 然后来到分磁盘的界面，这里非常非常重要。注意，现在的电脑磁盘格式一般都是`GPT`格式，而非`MBR格式`。进入这个界面以后，把能删的分区全部删除。然后按照下列步骤操作
+        + 先分好开机引导区，选中空闲分区，点击左下角的`+`，在`用于`一栏选择`EIF系统分区`，大小我们给`512MB`![alt text](.assets_IMG/Linux/image-112.png)
+        + 然后是交换空间的分配，同上，选中空闲分区，点击左下角的`+`在`用于`一栏选择`交换空间`，大小我们给`10000MB`![alt text](.assets_IMG/Linux/image-113.png)
+        + 我们再把跟挂载点和home分区合并，以免后续的空间不足。空闲分区，点击左下角的`+`在`用于`一栏选择`/`，大小不动，就是把所有剩下的内存全部分给这个分区。![alt text](.assets_IMG/Linux/image-114.png)
+        + 最后还有很关键的一步，就是选择启动项，在`+`下面这一栏，把引导项更换成我们分出来的EIF分区。然后点击continue。
+11. 名字和密码统一为`minipc`,`0`![alt text](.assets_IMG/Linux/image-115.png)
+12. 地区我们改成`Shanghai`，下一步
+13. 等待安装完成以后，拔掉U盘重新启动
+14. 安装完成
+## Ubuntu系统配置科学上网端口
+### 浏览器
+1. clash在Ubuntu系统上安装包下载`https://www.clash.la/releases/#google_vignette`
+2. 下载好了以后解压
+3. 解压好了以后打开`cfw`，注意，要先运行指令`chmod +x cfw`，给他加上可执行权限才可以正常运行
+4. 运行指令`./cfw`，配置节点后即可科学上网
+5. 打开设置，点击左侧第二个网络，网络代理选择成`手动`，把HTTP和HTTPS改成`127.0.0.1`,`7890`。![alt text](.assets_IMG/Linux/image-116.png)
+### 终端上网
+1. 在环境变量的最前面加上
+        + alias proxy="export http_proxy=http://127.0.0.1:7890;export https_proxy=http://127.0.0.1:7890"
+        + alias unproxy="unset http_proxy;unset https_proxy"
+2. ![alt text](.assets_IMG/Linux/image-117.png)
+## Ubuntu系统安装ros系统
+1. 参考ROS官网链接安装`https://wiki.ros.org/noetic/Installation/Ubuntu`
+2. 进入这个网站，找到Install部分前面我们已经配置好了科学上网，所以我们不管1.1
+3. 运行指令`sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'`,运行以后不报错就是配置好了。
+4. 运行指令`sudo apt install curl`
+5. 运行指令`curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -`,如果这里运行以后显示`OK`就是配置好了。
+6. 运行指令`sudo apt update`
+7. 运行指令`sudo apt install ros-noetic-desktop-full`，等待漫长的安装，这里可以尝试在运行这条指令之前，运行`proxy`命令，让终端上网后可能下载速度会更快。
+8. 运行指令`echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc`
+8. 运行指令`source ~/.bashrc`
+9. 运行指令`roscore`,可以看到成功启动
+10. 运行指令`sudo apt install python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential`
+8. 运行指令`sudo rosdep init`，注意，这里可能会出现无法连接的情况，这里的解决办法是用3条指令
+        + 安装Python的软件管理包pip，`sudo apt-get install python3-pip`
+        + 使用pip安装我们的配置修改文件`sudo pip3 install 6-rosdep`
+        + 最后一条指令，运行刚才下载好的配置修改文件`sudo 6-rosdep`
+        + 重新运行`sudo rosdep init`
+11. 安装完成
