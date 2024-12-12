@@ -1050,3 +1050,34 @@ eg:`ssh -X ldz@192.168.0.1`
         + 最后一条指令，运行刚才下载好的配置修改文件`sudo 6-rosdep`
         + 重新运行`sudo rosdep init`
 11. 安装完成
+## MobaXterm详细使用教程
+### MobaXterm详细使用教程（一）
+1. 软件的安装
+官网下载后解压文件，运行 MobaXterm_Personal_11.1.exe 即可开始安装。第一次打开会自解压，会比较慢，后续就正常了。
+2. 创建SSH session
+安装完毕之后界面长这个样。
++ ![alt text](.assets_IMG/Linux/image-118.png)
+当然你们刚安装完成是不会有任何session的。下面来创建第一个SSH session。点击菜单栏 「sessions」 –> 「new session」，即可弹出 「session setting」 对话框。由上面那一大串的连接方式我们就可以知道Moba的强大之处。
++ ![alt text](.assets_IMG/Linux/image-119.png)
+3. 我们点选第一个SSH图标，并填入相关信息，就可以完成session创建了。
+点击确定后，输入密码(输入密码时并不会显示，只管输入后按确定即可，第一次登陆成功后会提示保存密码，一般选择同意)，就可以连接上虚拟机了。而且边上虚拟机之后，它会自动通过FTP也连接到虚拟机，直接拖拽就可以进行文件复制了。登陆后界面主要分两块，左边的是主机的文件，右边是终端。勾选左下角的 “Follow terminal folder” 可以让两个的工作路径保持一致。
++ ![alt text](.assets_IMG/Linux/image-120.png)
+4. 快速连接session
++ 创建一个session之后，就可以在左侧的session标签里留下它的信息，下次需要连接的时候直接双击即可。
++ ![alt text](.assets_IMG/Linux/image-121.png)
+5. 创建串口session
++ 下面介绍串口session的创建。
++ 如同第2步，在「session setting」 对话框里选择serial，再选好串口号及波特率，点击OK就完成连接了。
++ 同样session会保存在左侧的session标签页里，方便下次连接。
++ ![alt text](.assets_IMG/Linux/image-122.png)
+6. 文件传输和下载
++ 可以采用直接拖拽的方式，或者采用鼠标右键选择相应功能。
++ ![alt text](.assets_IMG/Linux/image-123.png)
+7. 参考链接`https://blog.csdn.net/xuanying_china/article/details/120080644?ops_request_misc=%257B%2522request%255Fid%2522%253A%252286b5e7d6642670b171b02c018bcec0c2%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=86b5e7d6642670b171b02c018bcec0c2&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-120080644-null-null.142^v100^pc_search_result_base2&utm_term=mobaxterm%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B&spm=1018.2226.3001.4187`
+## 关于网桥的使用
+1. 实验室的网桥属于即插即用的那种。可以理解为插上了网桥就相当于两台电脑通过有线连接了，在同一个局域网下
+2. 一开始我以为有线的IP地址要固定为`192.168.1.2`，但其实不是，和在248网络下一样，只要正常配置分布式就行了，有线的IP和无线的IP的意义是一样的，只需要正常配置就行了。
+3. 我为了方便我把我电脑在248无线的IP地址和有线的IP地址都固定为了`192.168.1.31`，而白船的小电脑的IP也固定为了`192.168.1.100`这样就不用每次有线和无线切换就要重新写环境变量了。
+## 关于分布式通讯的一些说明
+1. 今天突然发现赵虚左的笔记有一个之前没有发现的地方，现在觉的很奇怪，就是我们配置分布式的时候roscore的主机两个环境变量命令都是同样的IP地址。而从的环境变量的两个IP地址是不同的，如图所示。![alt text](.assets_IMG/Linux/image-124.png)
+2. 想了一下发现就是对的，就应该是这样的。这两行命令的意义是，第一行指定运行`roscore`的主机，这里我们通常把`roscore`的机子称作为主机。主机的分布式配置就是应该指定自己的IP为`roscore`的IP，还要指定主机的IP地址，用于其他从机访问该主机。而对于从机来说，同样指定ROS主节点的URI（主机IP），从机需要通过这个地址与主机通信（ROS_MASTER_URI）。设置当前从机的IP地址，用于标识从机（ROS_HOSTNAME）。
