@@ -1081,3 +1081,12 @@ eg:`ssh -X ldz@192.168.0.1`
 ## 关于分布式通讯的一些说明
 1. 今天突然发现赵虚左的笔记有一个之前没有发现的地方，现在觉的很奇怪，就是我们配置分布式的时候roscore的主机两个环境变量命令都是同样的IP地址。而从的环境变量的两个IP地址是不同的，如图所示。![alt text](.assets_IMG/Linux/image-124.png)
 2. 想了一下发现就是对的，就应该是这样的。这两行命令的意义是，第一行指定运行`roscore`的主机，这里我们通常把`roscore`的机子称作为主机。主机的分布式配置就是应该指定自己的IP为`roscore`的IP，还要指定主机的IP地址，用于其他从机访问该主机。而对于从机来说，同样指定ROS主节点的URI（主机IP），从机需要通过这个地址与主机通信（ROS_MASTER_URI）。设置当前从机的IP地址，用于标识从机（ROS_HOSTNAME）。
+## 在Ubuntu上安装星火应用商店
+1. Google搜索`星火应用商店`，进入官网。
+2. 首先下载软件本体`spark-store_4.3.3.2_amd64.deb`，下载完以后不要着急解压，还要下载相应的依赖包
+3. 然后下载依赖包`spark-store-dependencies-kylin.zip`
+4. 下载完以后进入`spark-store-dependencies-kylin.zip`所在的文件夹，`unzip spark-store-dependencies-kylin.zip`解压，得到`spark-store-dependencies-kylin`，进入文件夹，还会看到有一个`解压我.tar`，`tar -xvf 解压我.tar`，会得到`all-depends`文件夹。
+5. 进入`all-depends`文件夹，再进入`Debian10-or-ubuntu-20.04`文件夹。
+6. 分别运行命令`sudo apt update`,`sudo apt install -yf ./*.deb`，这样就把依赖安装好了，接下来安装软件本体。
+7. 进入`spark-store_4.3.3.2_amd64.deb`文件所在的目录，在终端运行`sudo apt install -y ./spark-store_4.3.3.2_amd64.deb`，注意这里一定不能用`sudo dpkg -i spark-store_4.3.3.2_amd64.deb`来安装，这样是安装不上的，具体为什么不知道，官特别提示了这一点。
+8. 安装完成。
