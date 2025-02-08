@@ -124,7 +124,8 @@
    ![alt text](.assets_IMG/Pixhawk_note/image-12.png)  
    船上的飞控和GPS的罗盘芯片型号分别是IST8310和HMC5883。GPS为乐迪se100。(这里的型号为实际测试下来的型号，因为这个船年代久远，可能现在官网的型号与地面站中实际显示的型号不一样)  
    (并且实际测试发现，不管是设置`CAL_MAG0_PRIO = Disabled`还是设置`CAL_MAG1_PRIO = Disabled`，QGC首页中的罗盘方向都是Pixhawk的指向方向，但是如果单单禁用掉漂移严重的飞控内置罗盘，QGC首页中的罗盘方向确实更准了，这个目前还不知道是为什么。但是如果遇到飞控内置罗盘漂移严重的情况，将其禁用掉)  
-   2. `com_power_count = 0` 一直警报电池电压不够，但是电池实际电压够用，设置此参数，不检查电源
+   2. `com_power_count = 0` 一直警报电池电压不够，但是电池实际电压够用，设置此参数，不检查电源  
+   ![alt text](.assets_IMG/Pixhawk_note/image-94.png)
 2. 船这个机架下的解锁，是通过在飞行模式中设置，并通过拨杆来解锁的。其实油门位置，在解锁时无所谓。如果想让油门能控制电机正反转，可以设置如下参数为1500。这样油门居中时的PWM波就是1500  
    ![alt text](.assets_IMG/Pixhawk_note/image-56.png)
 ### 注意

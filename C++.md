@@ -698,3 +698,6 @@ string和char*区别：
 3. 并集  ![alt text](.assets_IMG/C++/image-342.png)   ![alt text](.assets_IMG/C++/image-343.png)
 4. 差集  ![alt text](.assets_IMG/C++/image-344.png)  
 5. ![alt text](.assets_IMG/C++/image-345.png)
+# 面向对象
+1. 类和对象
+        + ![alt text](.assets_IMG/C++/image-346.png)
