@@ -246,4 +246,23 @@
 + ![alt text](.assets_IMG/ros/image-86.png)
 + ![alt text](.assets_IMG/ros/image-87.png)
 + ![alt text](.assets_IMG/ros/image-88.png)
-+ 
+# ros日常笔记
+## ros自定义消息类型的对比
+### 赵旭左的方法
++ 赵旭左的方法是仅在某一个功能包里，把`.msg`文件放在一个`msg`文件里面，这样和下述阿木木的方法有一些差异，只能局限在一个功能包里用这种自定义的消息类型。步骤如下：
+1. 首先新建`msg`文件夹，在这个文件夹下写入`.msg`文件，这个文件里应该是你定义的消息类型，如下图所示![alt text](.assets_IMG/ros/image-89.png)
+2. 修改该功能包下的`.xml`文件，添加编译依赖和运行时依赖，分别是：`<build_depend>message_generation</build_depend>`和`<exec_depend>message_runtime</exec_depend>`
+3. 修改该功能包下的`CMakeLists`文件
+        + 首先添加编译依赖![alt text](.assets_IMG/ros/image-90.png)，这里意味着编译该功能包需要依赖于`message_generation`
+        + 然后放开添加你自己定义的`msg`文件的那一段，![alt text](.assets_IMG/ros/image-91.png)
+        + 再放开这一段：![alt text](.assets_IMG/ros/image-92.png)，这里意味着如果我要编译自己定义的消息类型文件，需要依赖于`std_msgs`，可以理解为是`std_msgs`组成的
+        + 放开`catkin_package`中的`CATKIN_DEPENDS`,添加`message_runtime`,我理解为这里是添加运行时依赖，和第一步是相对应的。
+### 阿木木的方法
++ 阿木木的方法就更加好用，相当于把范围扩大了，他是把上述的`msg`文件夹再包含在一个文件夹里面，比如是`common`文件夹下，这个`common`文件夹是与各个功能包平级的，然后编译的时候先编译`common`文件夹。对于我的`ros_boat_ws`项目则是`catkin build common`。这样所有的功能包就都可以使用这个`common`文件夹下，使用时候只需要包含头文件即可。如果想在功能包中使用自定义的消息类型的话，步骤如下，
+1. 首先建立`common`文件夹和`msg`文件夹和底下的消息类型文件。
+2. 这时，`common`就相当于一个功能包，在这个功能包下，就是和赵旭左的方法一样了，这是一个实现自定义消息类型的标准步骤。
+3. 在使用自定义消息类型的功能包下的`.xml`文件中添加`common`的编译依赖和运行时依赖。如图：![alt text](.assets_IMG/ros/image-93.png)
+4. 在该功能包的`CMakeLists`文件中，只需要添加编译时依赖和运行时依赖就可以了。如图：![alt text](.assets_IMG/ros/image-94.png)![alt text](.assets_IMG/ros/image-95.png)
+### 注意事项
+1. 注意：如果用阿木木的方法来使用自定义消息类型的话，需要在对应功能包下的`CMakeLists`文件把`add_dependencies(demo03_pub_person ${PROJECT_NAME}_generate_messages_cpp)`放开，这句的作用是保证在编译功能包之前把自定义消息类型文件先编译完，因为功能包的编译依赖于用到的自定义消息类型，如果自定义消息类型没有先编译的话，功能包的编译就可能会报错。
+2. 阿木木的方法则不需要这一步，因为我们写的船的项目是先手动编译`common`功能包的。

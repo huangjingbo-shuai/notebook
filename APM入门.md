@@ -22,7 +22,7 @@
 ### 仿真
 1. 以无人车/船为例，在ardupilot/Rover目录下执行：`../Tools/autotest/sim_vehicle.py -f rover`，执行完毕后会弹出下面的页面，然后打开地面站就可以链接到仿真的无人车了。
 ![alt text](.assets_IMG/APM入门/image-4.png)
-2. 仿真水下机器人的话，就在ardupilot/ArduSub目录下执行：`sim_vehicle.py -L RATBeach --out=udp:0.0.0.0:14550 --map --console`。执行成功后：![alt text](.assets_IMG/APM入门/image-5.png)
+2. 仿真水下机器人的话，就在ardupilot/ArduSub目录下执行：`../Tools/autotest/sim_vehicle.py -L RATBeach --out=udp:0.0.0.0:14550 --map --console`。执行成功后：![alt text](.assets_IMG/APM入门/image-5.png)
 3. gazebo安装：参考连接：`https://blog.csdn.net/qq_38768959/article/details/131133686`
         + ```sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'```
         + `wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -`
@@ -50,6 +50,8 @@
 + 参考博客`https://blog.csdn.net/qq_38768959/article/details/131133686`
 ### 多机仿真
 1. 参考博客`https://blog.csdn.net/qq_38768959/article/details/131133686`
+### 水下机器人gazebo环境搭建
+1. `https://www.bilibili.com/video/BV1BFaQe2EBd/?spm_id_from=333.337.search-card.all.click&vd_source=9cecaf1cdbe9321fee9e510aede34abf`
 
 
 ## APM实物上手
