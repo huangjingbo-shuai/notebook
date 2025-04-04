@@ -84,6 +84,7 @@
                 + 在ardupilot/Rover下启动回环仿真`../Tools/autotest/sim_vehicle.py -f rover --out=udp:127.0.0.1:14550 --out=udp:127.0.0.1:14551`
                 + 启动mavros`roslaunch apm.launch`或者`roslaunch mavros apm.launch fcu_url:=udp://:14551@127.0.0.1:14555`
                 + 再启动地面站，就可以了正常运行mavros代码进行仿真了。
+7. 水下机器人的在环仿真：`../Tools/autotest/sim_vehicle.py -L RATBeach --out=udp:0.0.0.0:14550 --out=udp:127.0.0.1:14551 --map --console`
 ## APM无人船姿态控制代码的逻辑整理
 1. mavros中的`setpoint_attitude.cpp`，通过`set_attitude_target`函数转为mavlink消息发送给飞控，![alt text](.assets_IMG/APM入门/image-12.png)，具体的`set_attitude_target`函数实现是![alt text](.assets_IMG/APM入门/image-13.png)，这里转成了`SET_ATTITUDE_TARGET`的mavlink消息类型。然而这里发送是`send_message`函数发送消息。![alt text](.assets_IMG/APM入门/image-14.png),这里封装和发送MAVLink消息，它将一个MAVLink消息对象序列化为标准的MAVLink数据包，并将其转换为ROS话题消息，然后通过ROS话题发布。这里的`uint8_t src_compid`是MAVLink 消息的来源组件ID，这个ID就是mavlink不同消息包对应的ID号。
 2. 上层发送的`setpoint_attitude`消息到了APM中的Rover模块下的`GCS_Mavlink.cpp`接收，具体是在`handle_message`这个函数中处理，![alt text](.assets_IMG/APM入门/image-15.png)，这个函数会根据消息的msgid（即消息类型）决定调用相应的处理函数，这里我们调用的是情况1。也就是`handle_set_attitude_target`这个函数在处理消息。
@@ -112,3 +113,61 @@
 7. 根据许军的代码，也都能对得上，其实就是要忽略什么就把什么加上去就行了。![alt text](.assets_IMG/APM入门/image-42.png)
 8. 但是姿态控制的掩码怎么都对不上。39、163都找不到缘由。但是我发现39-1-2-4=32，而且163-1-2-128=32。这里都是多了一个32。这里其实又卡了一会，但是我推测这个32可能是预留位，然后我把32减去，我只传7进去，发现效果一直，猜测验证，多加的这32就是预留位。
 9. 至此，掩码分析完毕。
+# 球形机器人AUV部分手搓调试记录
+## AUV的搭建
+1. 需要采购的零件，如图：![alt text](.assets_IMG/APM入门/c5211b7a984e28a4c735bca749a294d1.jpg)
+2. 光固化环氧树脂3D打印时要注意留一些余量，我猜测光固化3D打印可能存在尺寸上的误差，因此不能1:1打印，需要留大概一个毫米的余量，这次我打印的这个盘子基本上算是买回来了没有用上，孔小了，基本上都是我用锉刀锉出来的，那天锉到凌晨，记忆犹新，![alt text](.assets_IMG/APM入门/e2d36f6f8991fd5e6065bc716d557151.jpg)不用担心尺寸不够会漏水，双头都是有密封圈的，只要密封圈压紧就不会漏，但是密封圈不需要留余量。![alt text](.assets_IMG/APM入门/a55ed4ccb2ac541a290765ab6891fb3c.jpg)
+3. 在焊接电机和航空插头时，要注意先装上本来的有的外冒，外盖，和压紧盖，一共三个零件，先套在电机线的上面，要注意正反，确认无误以后，才能开始焊接，不然焊上无法做水密，等于白焊![alt text](.assets_IMG/APM入门/597f1fab028f8e4943d46257465622f8.jpg)；另外电机焊接最好买三芯的航插，不然八芯的航插焊口太小，一是不好焊，二是焊完容易和其他的线芯相互干涉，导致短路![alt text](.assets_IMG/APM入门/460bc1e8864135e3250e7b0c9d722fd1.jpg)；还有一件事很重要在焊接的时候，由于电机的线芯和航插口是铜制材料，和焊锡不易粘连，因此不用助焊剂的话很难焊，就算焊好了也很丑，一拔就断，还不牢固。
+4. 整体电路的搭建大致如图：![alt text](.assets_IMG/APM入门/image-43.png)
+5. 在给电机灌卡夫特密封胶的步骤：
+                + 首先先把航插拔下来，拧开后把，把露出来的线段大概一两厘米的区间用砂纸打磨一下，这是为了线能够和卡夫胶更好的粘合。
+                + 然后把后把拧紧，但是后冒先不拧，拧紧后把以后就可以开始打胶了，第一次打胶尽量打满，平放静置五分钟左右，待卡夫胶完全向下填满以后，上面还会留出一些空隙，继续打胶填满，重复此步骤直至基本不下沉为填满效果。
+                + 最后拧上后冒，继续填充卡夫胶，重复填充步骤，尽量最后的效果是溢出来一点尖尖的，这样的密封效果会更好。
+                + 打好以后一定要平放静置24小时左右才能干，这里的重点是一定要平放，不然卡夫胶容易侧漏，导致的后果就是连着卡紧帽一块固定，卡紧帽无法正常旋拧。
+## ArduSub固件的烧录
+1. 固件下载的网址是`https://firmware.ardupilot.org/`,这里面有ArduSub固件版本，和Rover类似这是APM固件的一个分支，是专门用作水下机器人控制的。![alt text](.assets_IMG/APM入门/image-44.png)
+2. 这里我用的固件版本是4.1.2![alt text](.assets_IMG/APM入门/image-46.png)，fmuv3,![alt text](.assets_IMG/APM入门/image-45.png),下载`.apj`文件即可通过地面站烧录。![alt text](.assets_IMG/APM入门/image-47.png)
+## AUV的第一次下水检验其气密性
+1. 其实第一次下水的时候我并没有买打压装置，所以第一次只能在各个航插上塞一点纸，来检验。
+2. 注意下水之前记得计算一下整个AUV的排水量，先给AUV做配重，不然沉不下去。
+3. 所有的航插全部用堵帽拧住，防止进水。
+4. 气密性测试试验（水池）
+![alt text](.assets_IMG/APM入门/3fb6d11076c5423f82f9158bcfc3af75.jpg)
+## AUV的打压测试办法
+1. 买一套能够适配通气螺栓的打压装置，电动的手动的都可以![alt text](.assets_IMG/APM入门/4f03cc9104513954bdb8b4390455fa0f.jpg)
+2. 接上打压枪，把仓内压力打到15MPa左右，然后保压20分钟，如果气压掉的超过1个兆帕，代表气密性不足，否则气密性良好。![alt text](.assets_IMG/APM入门/00edf9a0702d1c8038a2d2f81406aa5a.jpg)![alt text](.assets_IMG/APM入门/48d9584bbe030530544350e33e60db00.jpg)
+## AUV的电机测试
+1. ![alt text](.assets_IMG/APM入门/image-48.png)
+## AUV带线缆用作ROV的办法
+1. 和无人艇项目一样，岸上电脑和水下小电脑通信，只不过通信方式为带线，具体为LAN到LAN通讯，中间为了保证信号的完整与不失真，需要用电力载波模块作为中继。
+2. 电力载波模块接线图：![alt text](.assets_IMG/APM入门/c23fb79cbbca083d0dad937c58429e1c.jpg)，我用的是天启ROV家的版本，具体接线图如下图所示：![alt text](.assets_IMG/APM入门/image-49.png)
+3. 正常上电以后是可以把小电脑和岸上电脑放在同一局域网的，但是还没办法在岸上电脑直接遥控到ArduSub的电机，思路整理如下：
+                + 首先要明确一件事，当我们把飞控的A口直接与电脑相连的时候，遥控是可以直接遥控电机的，这是因为地面站会直接把遥控的信号转换成mavros信息发送给ArduSub，从而实现遥控。
+                + 也就是说就算我们现在大电脑和小电脑已经在同一个局域网，但大电脑还是没法连接ArduSub的地面站，这个问题的关键就是大电脑没有直接接收到ArduSub的mavlink信号，所以连接不上，所以我们需要做的就是用小电脑把串口将 MAVLink 信号转发到岸上。
+                + 具体的做法就是：![alt text](.assets_IMG/APM入门/image-50.png)
+                + ![alt text](.assets_IMG/APM入门/image-51.png)
+4. 首先在小电脑安装`MAVProxy`，在大环境下安装，注意一定要退出`base`环境，不然很容易出现问题，还不好解释，容易找不到原因。运行`pip install MAVProxy --user`。MAVProxy定义:是一个由 ArduPilot 官方开发的 命令行地面站（GCS）程序，可以让你通过串口、网口等方式与飞控进行通信和控制。
+5. 运行`mavproxy.py --master=/dev/ttyUSB0,921600 --out=udp:192.168.1.31:14550`，这里需要指定串口名称和波特率以及输出的IP和对应的端口号，避免数据流冲突。
+6. 此时在大电脑上运行地面站就可以正常启动地面站了，也可以正常手摇电机了。
+7. 如何将USB摄像头的图像数据传送到地面站？操作如下：
+                + 使用 GStreamer 视频流工具，运行：`gst-launch-1.0 v4l2src device=/dev/video0 ! video/x-raw,width=640,height=480 ! videoconvert ! x264enc tune=zerolatency ! rtph264pay ! udpsink host=192.168.1.31 port=5600`，把数据流传到大电脑，但是发现报错没有`v4l2src`模块，运行`sudo apt install -y gstreamer1.0-tools \gstreamer1.0-plugins-base \gstreamer1.0-plugins-good \gstreamer1.0-plugins-bad \gstreamer1.0-plugins-ugly \gstreamer1.0-libav \gstreamer1.0-doc \gstreamer1.0-x \v4l-utils`安装模块。注意了，这里一定要在大环境下，一定要退出base环境，我在调试的时候没有退出base环境，我安装在base环境，但是命令是在大环境运行的，所以一直报错大环境没有`v4l2src`包，因为我装在了base环境了。
+                + 安装好运行好了以后，再岸上地面站就可以正常接收视屏数据，左下角可以点击切换画面，就可以看到USB摄像头画面了。
+## 遥控器的调试（目前可以满足使用，深入的开发暂时还没进行，留白）
+
+
+## AUV第二次下水测试手摇功能记录
+### 下水准备阶段
+1. 布局理线。由于这个AUV要实现的功能比较多，用电器和电压等各不相同，接线的时候要注意保证一些裸露的接线头不能相互接触到，有一些是用的旧的接线头子，有的香蕉头的热缩管之前的师兄没有吹好，有的也破损了，但是我又不好全部拆掉，所以排线的时候尽量让这些香蕉头错开来排，但最好的办法就是按照规范来套热缩管。
+2. 这里在整体安装的时候发现我们内部的两层托盘，最底下的那层好像没办法完全固定，这一次我是在周围贴上厚的胶布来和耐压仓四周压住，靠摩擦力来固定。![alt text](.assets_IMG/APM入门/image-52.png)
+3. 接线的时候发现有些线有长有短，长的还好，短的就不好接线了。由于我的飞控放在最上面那一层，所以电机的信号线、供电线、深度计的IIC线以及USB-TTL都不好接，所以做延长线花了很多时间。
+4. 在上电之前一定要反复检查接线的正确性，特别是线一多，不好分辨，一定一定不能把正负接反。我在第一次上电的时候小电脑的DC接口不知道为什么突然冒烟了，我反复的检查了接线没有发现任何问题，我怀疑是由于我接线的时候线扭曲的太厉害了，导致正负可能某个位置碰到一起了，所以才会冒烟的。所以第一次上电之前，一定一定要谨慎。
+5. 接线整体效果：
+           + 未上盖![alt text](.assets_IMG/APM入门/f8bcd54d2648a9ebb95fcefa3f340b66.jpg)
+           + ![alt text](.assets_IMG/APM入门/c6c5e7087693bcdbb5cabda4cf605817.jpg)
+           + 上盖效果![alt text](.assets_IMG/APM入门/4e6f1500f5b74f0991b2705c3402de9c.jpg)
+           + ![alt text](.assets_IMG/APM入门/f59a7f0e94f3be29c570f44b1a4b03af.jpg)
+           + 完整体打压后下水浸泡测试![alt text](.assets_IMG/APM入门/d29d8903c601da6c3279132f826365fc.jpg)![alt text](.assets_IMG/APM入门/cd0e089fc519cc8479ad460be950b88a.jpg)
+6. 下水前最后的密封、打密封油脂和功能测试。![alt text](.assets_IMG/APM入门/68f4f9c08bc61bdf34778e00122b1f3d.jpg)![alt text](.assets_IMG/APM入门/784d45d24dacc865a623606027f19f56.jpg)
+7. 帅照展示：![alt text](.assets_IMG/APM入门/35c9397707aa86869d1eb4f86cae7dfd.jpg)![alt text](.assets_IMG/APM入门/8005870a82c4bbf9fdcdb0abff3d9007.jpg)![alt text](.assets_IMG/APM入门/68f1d160d6eafe99cecfbb2d767c0133.jpg)
+### 问题记录
+1. 此次下水最大的问题是电机一直会重启，当时推测是电压不够。后来发现是因为我把四个电机的电源输入用电源管理模块的12v输出作为输入了，而问题就出在这里，这个电源管理的12v电流只有可怜的0.5A，四个电机的总功率加起来已经超过了1000w，这个口完全带不动，所以电机才会在大油门的时候重启，因为功率不够，电压会跳变，低于12v的最低启动电压，关机，而一放开，电压又正常，重新初始化电机。![alt text](.assets_IMG/APM入门/b54b7c88d641633d63714e8093874e8c.jpg)

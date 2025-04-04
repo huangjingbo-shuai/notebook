@@ -266,3 +266,8 @@
 ### 注意事项
 1. 注意：如果用阿木木的方法来使用自定义消息类型的话，需要在对应功能包下的`CMakeLists`文件把`add_dependencies(demo03_pub_person ${PROJECT_NAME}_generate_messages_cpp)`放开，这句的作用是保证在编译功能包之前把自定义消息类型文件先编译完，因为功能包的编译依赖于用到的自定义消息类型，如果自定义消息类型没有先编译的话，功能包的编译就可能会报错。
 2. 阿木木的方法则不需要这一步，因为我们写的船的项目是先手动编译`common`功能包的。
+## python开发ros笔记
+1. 声明`shebang`的作用：就是指定python解释器的路径。如果指定了，运行的时候可以直接在脚本目录下运行`./xxx`，而如果没有声明的话运行则需要`python ./xxx`或者`python3 ./xxx`。如图：![alt text](.assets_IMG/ros/image-96.png)
+2. catkin_install_python() 作用：与rosrun相关，不配置rosrun找不到脚本。![alt text](.assets_IMG/ros/image-97.png)。![alt text](.assets_IMG/ros/image-98.png)
+## 源码安装mavros后找不到mavros的某些消息包问题解决
+1. 按照南京超维空间的`px4从放弃到精通(二)`源码安装mavros后，编译时报错发现少了mavros的某些消息包，这里的解决办法是在`CMakeLists`文件中的第四个有效行指定mavros的消息依赖路径，`set(mavros_msgs_DIR "/home/yunxia/mavros_ws/devel/share/mavros_msgs/cmake")`即可解决问题。
