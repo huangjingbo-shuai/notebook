@@ -14,23 +14,25 @@
 1. 编译固件前，要配置编译的固件的目标硬件
 我这里使用的是pix2.4.8飞控，所以使用fmuv3的固件，配置如下：`./waf configure --board fmuv3`
 2. 如果出现报错`缺少waf子模块`，用命令`git submodule update --init --recursive --force`后解决。
-3. 如果出现报错`ChibiOS build requires g++ version 10.2.1 or later, found 5.4.1`,![alt text](.assets_IMG/APM入门/image.png)原因是我们用源码下载依赖的时候下的版本就没有达到`10.2.1`以上，这地方很坑，我一直以为是`gcc`的版本问题，导致我不断地找gcc的问题，但其实不是，这里是用的ARM专用的工具链。而一开始我们下载的这个工具链的版本就是不对的，需要手动下载，链接是`https://developer.arm.com/downloads/-/gnu-rm`,这是ARM已经弃用的一个网站，但是可以从上面下载大于10.2.1的
+3. 如果编译出现一大堆的红色的报错，那么就是缺少waf的子模块，采用以上`git submodule update --init --recursive --force`的做法来解决。
+4. 如果出现报错`ChibiOS build requires g++ version 10.2.1 or later, found 5.4.1`,![alt text](.assets_IMG/APM入门/image.png)原因是我们用源码下载依赖的时候下的版本就没有达到`10.2.1`以上，这地方很坑，我一直以为是`gcc`的版本问题，导致我不断地找gcc的问题，但其实不是，这里是用的ARM专用的工具链。而一开始我们下载的这个工具链的版本就是不对的，需要手动下载，链接是`https://developer.arm.com/downloads/-/gnu-rm`,这是ARM已经弃用的一个网站，但是可以从上面下载大于10.2.1的
 `gcc-arm-none-eabi`版本。最好用命令`sudo tar -xvf gcc-arm-none-eabi-10.x-linux.tar.bz2 -C /opt`解压到opt路径下,然后最关键的一步设置环境变量。进入`~/.bashrc`中，最后一行加上`export PATH=/opt/gcc-arm-none-eabi-10.x/bin:$PATH`,这里注意路径一定要找正确，应该是有这些文件的文件夹目录下：![alt text](.assets_IMG/APM入门/image-1.png)。
-4. 完成操作以后再运行`arm-none-eabi-gcc --version`，此时arm-none-eabi-gcc的版本已经成功换成高版本的了。![alt text](.assets_IMG/APM入门/image-2.png)
-5. 最后正常编译车/船部分，`./waf rover`，成功
+5. 另外，如果安装并切换好了`g++`后，重新进入`~/ardupilot`运行`./waf configure --board fmuv3`还是显示`g++`版本不对，则手动刷新一下环境变量，即可解决问题。
+1. 完成操作以后再运行`arm-none-eabi-gcc --version`，此时arm-none-eabi-gcc的版本已经成功换成高版本的了。![alt text](.assets_IMG/APM入门/image-2.png)
+2. 最后正常编译车/船部分，`./waf rover`，成功
         ![alt text](.assets_IMG/APM入门/image-3.png)
 ### 仿真
 1. 以无人车/船为例，在ardupilot/Rover目录下执行：`../Tools/autotest/sim_vehicle.py -f rover`，执行完毕后会弹出下面的页面，然后打开地面站就可以链接到仿真的无人车了。
 ![alt text](.assets_IMG/APM入门/image-4.png)
-2. 仿真水下机器人的话，就在ardupilot/ArduSub目录下执行：`../Tools/autotest/sim_vehicle.py -L RATBeach --out=udp:0.0.0.0:14550 --map --console`。执行成功后：![alt text](.assets_IMG/APM入门/image-5.png)
-3. gazebo安装：参考连接：`https://blog.csdn.net/qq_38768959/article/details/131133686`
+1. 仿真水下机器人的话，就在ardupilot/ArduSub目录下执行：`../Tools/autotest/sim_vehicle.py -L RATBeach --out=udp:0.0.0.0:14550 --map --console`。执行成功后：![alt text](.assets_IMG/APM入门/image-5.png)
+2. gazebo安装：参考连接：`https://blog.csdn.net/qq_38768959/article/details/131133686`
         + ```sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'```
         + `wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -`
         + `sudo apt update`
         + `sudo apt install gazebo9 libgazebo9-dev`
         + 安装成功后执行：`gazebo --verbose`
         + 如果能弹出空的gazebo界面，说明安装成功
-4. 装gazebo插件：
+3. 装gazebo插件：
         + `git clone https://github.com/khancyr/ardupilot_gazebo`
         + `cd ardupilot_gazebo`
         + `mkdir build`
@@ -39,7 +41,7 @@
         + `make -j4`
         + `sudo make install`
         + 成功后如下：![alt text](.assets_IMG/APM入门/image-6.png)
-5. 修改环境变量：
+4. 修改环境变量：
         + `source /usr/share/gazebo/setup.sh`
         + `export GAZEBO_MODEL_PATH=~/ardupilot_gazebo/models:${GAZEBO_MODEL_PATH}`
         + `export GAZEBO_MODEL_PATH=~/ardupilot_gazebo/models_gazebo:${GAZEBO_MODEL_PATH}`
@@ -113,6 +115,40 @@
 7. 根据许军的代码，也都能对得上，其实就是要忽略什么就把什么加上去就行了。![alt text](.assets_IMG/APM入门/image-42.png)
 8. 但是姿态控制的掩码怎么都对不上。39、163都找不到缘由。但是我发现39-1-2-4=32，而且163-1-2-128=32。这里都是多了一个32。这里其实又卡了一会，但是我推测这个32可能是预留位，然后我把32减去，我只传7进去，发现效果一直，猜测验证，多加的这32就是预留位。
 9. 至此，掩码分析完毕。
+## blueROV的gazebo-ArduSub联合仿真
+1. 按照上面仿真的办法先编译好APM固件
+2. 卸载gazebo11，安装gazebo9，因为这个仿真是建立在gazebo9的版本的。
+              + sudo apt-get remove --purge gazebo11*
+              + sudo apt-get remove --purge libgazebo11*
+              + sudo apt-get autoremove
+              + sudo apt-get autoclean
+              + sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+              + wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+              + sudo apt update
+              + sudo apt install gazebo9 libgazebo9-dev
+3. 安装`freebuoyancy_gazebo`用于浮力模拟的插件,这个一般是不会有问题的，如果想要验证浮力插件是否安装成功可以在下载 BlueRov2 Gazebo 模型后仿真看看ardusub是否会在海面漂浮，如果没有这个浮力插件，ardusub在按下仿真开始键后会直接沉入海底。该软件包构建了两个 Gazebo 插件：
+freebuoyancy_gazebo（模型插件） 模拟来自水的浮力和粘性力
+安装：在ubuntu终端输入:
+                + git clone https://github.com/bluerobotics/freebuoyancy_gazebo
+                + cd freebuoyancy_gazebo
+                + mkdir build
+                + cd build
+                + cmake ..
+                + make
+                + sudo make install
+4. 安装`ardupilot_gazebo/add_link` 插件进行 `ardupilot-gazebo` 通信。`add_link` 是一个通过 `sdf` 链路提供驱动功能的分支，在 之后，必须运行 `.git clone git checkout add_link`
+                + git clone https://github.com/patrickelectric/ardupilot_gazebo
+                + cd ardupilot_gazebo
+                + git checkout add_link
+                + mkdir build
+                + cd build
+                + cmake ..
+                + make -j4
+                + sudo make install
+6. 下面切换到主文件夹的终端，根据以上的命令我们已经切换到ardupilot_gazebo/build路径下了，接下来的命令是在主文件夹下进行的，如何不会切换终端路径的命令，可以关闭终端重新开启就返回最初的终端窗口了。`echo 'source /usr/share/gazebo/setup.sh' >> ~/.bashrc`设置 Gazebo 模型的路径（将路径调整为克隆存储库的位置）`echo 'export GAZEBO_MODEL_PATH=~/ardupilot_gazebo/models' >> ~/.bashrc`,设置 Gazebo 世界的路径（将路径调整为克隆仓库的位置）`echo 'export GAZEBO_RESOURCE_PATH=~/ardupilot_gazebo/worlds:${GAZEBO_RESOURCE_PATH}' >> ~/.bashrc`,`source ~/.bashrc`
+7. 运行 BlueRov2 Gazebo 模型。下载bluerov_ros_playground:` git clone https://github.com/patrickelectric/bluerov_ros_playground`。运行 Gazebo 模型：`cd bluerov_ros_playground` `source gazebo.sh` `gazebo worlds/underwater.world -u`。输入完命令后就可以在gazebo上面看到ardusub的模型了，以后每次仿真只需运行上面的命令即可打开ardusub模型。最后不要忘记在gazebo界面点击仿真开始的功能键。![alt text](.assets_IMG/APM入门/image-56.png)
+8. 执行 ArduPilot SITL。在`ardupilot`目录下执行`./Tools/autotest/sim_vehicle.py -v ArduSub -f gazebo-bluerov2 -L RATBeach --out=udp:0.0.0.0:14550 --console`启动![alt text](.assets_IMG/APM入门/image-57.png)
+9. 我参考的博客`https://blog.csdn.net/weixin_49839886/article/details/140670850?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522929e2b2ca390b3fd375593bc46a3974a%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=929e2b2ca390b3fd375593bc46a3974a&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-140670850-null-null.142^v102^pc_search_result_base7&utm_term=ardusub%E4%BD%BF%E7%94%A8gazebo&spm=1018.2226.3001.4187`,以及许军的视频`https://www.bilibili.com/video/BV1BFaQe2EBd/?spm_id_from=333.788.videopod.sections&vd_source=9cecaf1cdbe9321fee9e510aede34abf`
 # 球形机器人AUV部分手搓调试记录
 ## AUV的搭建
 1. 需要采购的零件，如图：![alt text](.assets_IMG/APM入门/c5211b7a984e28a4c735bca749a294d1.jpg)
@@ -147,11 +183,13 @@
                 + 具体的做法就是：![alt text](.assets_IMG/APM入门/image-50.png)
                 + ![alt text](.assets_IMG/APM入门/image-51.png)
 4. 首先在小电脑安装`MAVProxy`，在大环境下安装，注意一定要退出`base`环境，不然很容易出现问题，还不好解释，容易找不到原因。运行`pip install MAVProxy --user`。MAVProxy定义:是一个由 ArduPilot 官方开发的 命令行地面站（GCS）程序，可以让你通过串口、网口等方式与飞控进行通信和控制。
-5. 运行`mavproxy.py --master=/dev/ttyUSB0,921600 --out=udp:192.168.1.31:14550`，这里需要指定串口名称和波特率以及输出的IP和对应的端口号，避免数据流冲突。
+5. 运行`mavproxy.py --master=/dev/ttyUSB0,921600 --out=udp:192.168.1.31:14550`或者是`mavproxy.py --master=/dev/ttyACM0,921600 --out=udp:192.168.1.31:14550`，一般来说USB0是采用USB转TTL来进行飞控和电脑之间的数据传输，而ACM0是USB转A口进行数据传输的，特别注意，我们一般使用USB转TTL加`power`口供电，而不单独用USB转A，这样会电压不够，但是同时插上`power`口的话，又有很大的概率把飞控烧坏，故此尽量采用`power`加USB转TTL的方法。这里需要指定串口名称和波特率以及输出的IP和对应的端口号，避免数据流冲突。
 6. 此时在大电脑上运行地面站就可以正常启动地面站了，也可以正常手摇电机了。
 7. 如何将USB摄像头的图像数据传送到地面站？操作如下：
                 + 使用 GStreamer 视频流工具，运行：`gst-launch-1.0 v4l2src device=/dev/video0 ! video/x-raw,width=640,height=480 ! videoconvert ! x264enc tune=zerolatency ! rtph264pay ! udpsink host=192.168.1.31 port=5600`，把数据流传到大电脑，但是发现报错没有`v4l2src`模块，运行`sudo apt install -y gstreamer1.0-tools \gstreamer1.0-plugins-base \gstreamer1.0-plugins-good \gstreamer1.0-plugins-bad \gstreamer1.0-plugins-ugly \gstreamer1.0-libav \gstreamer1.0-doc \gstreamer1.0-x \v4l-utils`安装模块。注意了，这里一定要在大环境下，一定要退出base环境，我在调试的时候没有退出base环境，我安装在base环境，但是命令是在大环境运行的，所以一直报错大环境没有`v4l2src`包，因为我装在了base环境了。
                 + 安装好运行好了以后，再岸上地面站就可以正常接收视屏数据，左下角可以点击切换画面，就可以看到USB摄像头画面了。
+8. ![alt text](.assets_IMG/APM入门/image-54.png)
+9. ![alt text](.assets_IMG/APM入门/image-53.png)
 ## 遥控器的调试（目前可以满足使用，深入的开发暂时还没进行，留白）
 
 
@@ -169,5 +207,9 @@
            + 完整体打压后下水浸泡测试![alt text](.assets_IMG/APM入门/d29d8903c601da6c3279132f826365fc.jpg)![alt text](.assets_IMG/APM入门/cd0e089fc519cc8479ad460be950b88a.jpg)
 6. 下水前最后的密封、打密封油脂和功能测试。![alt text](.assets_IMG/APM入门/68f4f9c08bc61bdf34778e00122b1f3d.jpg)![alt text](.assets_IMG/APM入门/784d45d24dacc865a623606027f19f56.jpg)
 7. 帅照展示：![alt text](.assets_IMG/APM入门/35c9397707aa86869d1eb4f86cae7dfd.jpg)![alt text](.assets_IMG/APM入门/8005870a82c4bbf9fdcdb0abff3d9007.jpg)![alt text](.assets_IMG/APM入门/68f1d160d6eafe99cecfbb2d767c0133.jpg)
-### 问题记录
+### 问题记录解决
 1. 此次下水最大的问题是电机一直会重启，当时推测是电压不够。后来发现是因为我把四个电机的电源输入用电源管理模块的12v输出作为输入了，而问题就出在这里，这个电源管理的12v电流只有可怜的0.5A，四个电机的总功率加起来已经超过了1000w，这个口完全带不动，所以电机才会在大油门的时候重启，因为功率不够，电压会跳变，低于12v的最低启动电压，关机，而一放开，电压又正常，重新初始化电机。![alt text](.assets_IMG/APM入门/b54b7c88d641633d63714e8093874e8c.jpg)
+        + 我的解决办法是把四个电机的总电源用一个12v的稳压模块接到电源管理模块的直出口，同时，我在这个直出口做了两路分线，一路经过12v稳压模块给四个电机供稳定的12v电压，另外一路给小电脑供14.8-16.8的宽电压，小电脑的输入电压是12-19v。这里要注意的细节是，四个电机的功率是非常大的，在运作的时候电路中会有反电动势，很容易把小电脑打坏，所以电机和小电脑两个中必须有一个接稳压模块来抵消反电动势，但是小电脑12v运作不太正常，会反复的重启，所以我全电压供给小电脑，12v稳压模块给电机，问题完美解决。
+2. ![alt text](.assets_IMG/APM入门/image-55.png)
+## 第三次下水记录
+1. 继上次修改电路以后，发现比上次好了，但是还是会断，电机会重启，这次可以一对电机满推了，但是如果全部满推的话还是会重启。这次我推测原因应该是电机的12v降压模块没办法承受电机这么大的电流。另外，航模电池本身比较暴力，多少输出其实无所谓，用多少算多少，大概率不是电池的问题。我的解决办法是换一个能够承受超过100A的12v稳压模块。期待下次的改进试水。
