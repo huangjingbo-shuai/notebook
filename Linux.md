@@ -1090,3 +1090,9 @@ eg:`ssh -X ldz@192.168.0.1`
 6. 分别运行命令`sudo apt update`,`sudo apt install -yf ./*.deb`，这样就把依赖安装好了，接下来安装软件本体。
 7. 进入`spark-store_4.3.3.2_amd64.deb`文件所在的目录，在终端运行`sudo apt install -y ./spark-store_4.3.3.2_amd64.deb`，注意这里一定不能用`sudo dpkg -i spark-store_4.3.3.2_amd64.deb`来安装，这样是安装不上的，具体为什么不知道，官特别提示了这一点。
 8. 安装完成。
+## 查看磁盘空间
+1. `df -hl`
+## 查看当前内核版本
+1. uname -a
+## Ubuntu缺少字体问题解决
+1. 参考博客`https://blog.csdn.net/willingtolove/article/details/116423173`

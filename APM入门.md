@@ -68,6 +68,7 @@
 8. 注意，此时要注意观察电机的正反转，以及遥控器的通道设置，检查修改即可，这个很简单。
 9. 在室外进行调试的时候，发现`roslaunch mavros apm.launch`无法正常启动，这是因为apm.launch中的端口默认是ACM0，且波特率默认是57600。当出现类似的问题，应该`roscd mavros`,`cd launch`,`vim apm.launch`，把端口号改为`USB0`，且波特率改为`921600`。
 10. 改完以后要与地面站的端口号的波特率一致，将参数`SERIAL2_BAUD`参数改为921600。
+11. 解锁报错`Pre arm hardware safety switch`，把`brd_safetyenable`禁用即可。
 
 ## MP地面站的安装
 1. `Mission Planner`可以在官网免费下载，`https://firmware.ardupilot.org/Tools/MissionPlanner/MissionPlanner-latest.msi`
@@ -183,13 +184,22 @@ freebuoyancy_gazebo（模型插件） 模拟来自水的浮力和粘性力
                 + 具体的做法就是：![alt text](.assets_IMG/APM入门/image-50.png)
                 + ![alt text](.assets_IMG/APM入门/image-51.png)
 4. 首先在小电脑安装`MAVProxy`，在大环境下安装，注意一定要退出`base`环境，不然很容易出现问题，还不好解释，容易找不到原因。运行`pip install MAVProxy --user`。MAVProxy定义:是一个由 ArduPilot 官方开发的 命令行地面站（GCS）程序，可以让你通过串口、网口等方式与飞控进行通信和控制。
-5. 运行`mavproxy.py --master=/dev/ttyUSB0,921600 --out=udp:192.168.1.31:14550`或者是`mavproxy.py --master=/dev/ttyACM0,921600 --out=udp:192.168.1.31:14550`，一般来说USB0是采用USB转TTL来进行飞控和电脑之间的数据传输，而ACM0是USB转A口进行数据传输的，特别注意，我们一般使用USB转TTL加`power`口供电，而不单独用USB转A，这样会电压不够，但是同时插上`power`口的话，又有很大的概率把飞控烧坏，故此尽量采用`power`加USB转TTL的方法。这里需要指定串口名称和波特率以及输出的IP和对应的端口号，避免数据流冲突。
+5. 运行`mavproxy.py --master=/dev/ttyUSB0,115200 --out=udp:192.168.1.31:14550`或者是`mavproxy.py --master=/dev/ttyACM0,115200 --out=udp:192.168.1.31:14550`，建议尝试使用一个 较低的、更稳定的波特率，例如 `115200`，之前用的`921600`,发现不太稳定，地面站会时常断。一般来说USB0是采用USB转TTL来进行飞控和电脑之间的数据传输，而ACM0是USB转A口进行数据传输的，特别注意，我们一般使用USB转TTL加`power`口供电，而不单独用USB转A，这样会电压不够，但是同时插上`power`口的话，又有很大的概率把飞控烧坏，故此尽量采用`power`加USB转TTL的方法。这里需要指定串口名称和波特率以及输出的IP和对应的端口号，避免数据流冲突。
 6. 此时在大电脑上运行地面站就可以正常启动地面站了，也可以正常手摇电机了。
 7. 如何将USB摄像头的图像数据传送到地面站？操作如下：
                 + 使用 GStreamer 视频流工具，运行：`gst-launch-1.0 v4l2src device=/dev/video0 ! video/x-raw,width=640,height=480 ! videoconvert ! x264enc tune=zerolatency ! rtph264pay ! udpsink host=192.168.1.31 port=5600`，把数据流传到大电脑，但是发现报错没有`v4l2src`模块，运行`sudo apt install -y gstreamer1.0-tools \gstreamer1.0-plugins-base \gstreamer1.0-plugins-good \gstreamer1.0-plugins-bad \gstreamer1.0-plugins-ugly \gstreamer1.0-libav \gstreamer1.0-doc \gstreamer1.0-x \v4l-utils`安装模块。注意了，这里一定要在大环境下，一定要退出base环境，我在调试的时候没有退出base环境，我安装在base环境，但是命令是在大环境运行的，所以一直报错大环境没有`v4l2src`包，因为我装在了base环境了。
                 + 安装好运行好了以后，再岸上地面站就可以正常接收视屏数据，左下角可以点击切换画面，就可以看到USB摄像头画面了。
 8. ![alt text](.assets_IMG/APM入门/image-54.png)
 9. ![alt text](.assets_IMG/APM入门/image-53.png)
+## ros控制之前的准备工作
+1. 以上通过地面站可以顺利遥控ROV，但是我发现虽然用了`mavproxy`把mavlink数据发到了岸上电脑，但是小电脑没办法启动`mavros`了。这里我尝试`mavproxy.py --master=/dev/ttyUSB0,115200 --out=udp:192.168.1.31:14550 --out=udp:127.0.0.1:14551`,这里的意思是用`mavproxy`工具把`USB0`接收到的`mavlink`数据流发送到`192.168.1.31:14550`和本地的`14551`两个端口，这一步是没有问题的。
+2. 但是当我尝试用`roslaunch mavros apm.launch fcu_url:="udp://@127.0.0.1:14551"`想启动`mavros`的时候确卡在界面，正常是会有消息的跳变的。但是却卡在：![alt text](.assets_IMG/APM入门/image-58.png)
+3. 这里我找了很久的原因，问gpt也问不出原因，最后突然想起之前超维空间做本地回环仿真的时候，他们写的回环是：![alt text](.assets_IMG/APM入门/image-59.png)，我发现他们指定了监听端口。
+4. 最后我运行`roslaunch mavros apm.launch fcu_url:="udp://127.0.0.1:14551@14555`顺利启动mavros。原因就是很可能在于 "端口绑定 (port binding)" 的机制，以及在你的特定环境下，自动端口选择可能遇到了问题。MAVROS 内部的端口选择逻辑在特定情况下可能存在一些边缘情况，导致未能正确选择到可用端口。 虽然 MAVROS 是成熟的软件，但软件总有可能存在一些边界情况的bug。静默失败 (Silent Failure): 当 MAVROS 自动端口绑定 不成功 时， 它 可能不会 立即报错。 MAVROS 可能会继续启动，尝试连接到目标地址，但是由于没有成功绑定到正确的接收端口，它 无法接收到来自 mavproxy 的数据。 这就导致了你看到的 "卡住，没有消息输出，但是也没有报错" 的情况。 MAVROS 节点可能启动了，但是数据流没有建立起来。fcu_url:="udp://127.0.0.1:14551@14555" (工作正常):目标地址 (Target Address): 127.0.0.1:14551 - 与之前相同，MAVROS 向 mavproxy 发送数据。绑定地址 (Bind Address): @14555 - 显式指定为 14555 端口。 在这种情况下，MAVROS 强制绑定到本地的 14555 端口 作为接收数据的端口。绕过端口冲突 (Bypassing Port Conflict): 当你显式指定 14555 端口时， MAVROS 不再需要进行自动端口选择。 它会直接尝试绑定到 14555 端口。 如果 14555 端口在你的系统上是 可用 的，那么 MAVROS 就能成功绑定，开始监听和接收数据。
+5. 用更形象的比喻来解释：想象 MAVROS 和 mavproxy 是两家公司，需要通过 UDP 协议进行通信。127.0.0.1:14551 就像是 mavproxy 公司的 对外服务窗口 的地址和电话号码 (14551)。 如果 MAVROS 公司要给 mavproxy 公司发送文件或指令，它需要知道 mavproxy 公司的服务窗口地址和电话，然后把东西送到那里。 这就是 MAVROS 发送数据 到 127.0.0.1:14551 的过程。127.0.0.1:14555 (当指定 @14555 时) 就像是 MAVROS 公司 内部的接收部门 的电话号码 (14555)。 MAVROS 公司需要告诉 mavproxy 公司： "如果你要发数据给我，请发到我的这个内部接收部门的电话 14555， 我会在这里接听电话 (监听端口) 接收数据。" 这就是 MAVROS 绑定到 14555 端口并接收数据 的过程。
+6. 我可以理解为 mavproxy 把 MAVLink 数据包 发送到目标地址 127.0.0.1:14551， 然后 mavros 需要 在本地设置一个 接收端口 (绑定端口)， 例如 14555 (当我们使用 @14555 时)。 mavros 会 监听 自己设置的接收端口 (例如 14555)， 并等待接收 任何程序发送到这个端口的数据包。 在这种情况下，我们期望接收到的是 mavproxy 发送到 127.0.0.1:14555 的数据包 (虽然 mavproxy 最初配置的是发送到 14551， 但由于 UDP 的特性，数据包可能最终能被监听 14555 的 MAVROS 接收到， 具体原因比较复杂)。 这样理解更准确。
+7. 但我尝试运行`mavproxy.py --master=/dev/ttyUSB0,115200 --out=udp:192.168.1.31:14550 --out=udp:127.0.0.1:14555`以及`roslaunch mavros apm.launch fcu_url:="udp://@127.0.0.1:14555"`也是可以的。那为什么一开始都是`14551`就不行呢？![alt text](.assets_IMG/APM入门/image-60.png)![alt text](.assets_IMG/APM入门/image-61.png)
+8. 最终解决方案：运行`mavproxy.py --master=/dev/ttyUSB0,115200 --out=udp:192.168.1.31:14550 --out=udp:127.0.0.1:14555`加`roslaunch mavros apm.launch fcu_url:="udp://@127.0.0.1:14555"`。或者运行`mavproxy.py --master=/dev/ttyUSB0,921600 --out=udp:192.168.1.31:14550 --out=udp:127.0.0.1:14551`加`roslaunch mavros apm.launch fcu_url:="udp://127.0.0.1:14551@14555"`。问题完美解决。
 ## 遥控器的调试（目前可以满足使用，深入的开发暂时还没进行，留白）
 
 
@@ -213,3 +223,17 @@ freebuoyancy_gazebo（模型插件） 模拟来自水的浮力和粘性力
 2. ![alt text](.assets_IMG/APM入门/image-55.png)
 ## 第三次下水记录
 1. 继上次修改电路以后，发现比上次好了，但是还是会断，电机会重启，这次可以一对电机满推了，但是如果全部满推的话还是会重启。这次我推测原因应该是电机的12v降压模块没办法承受电机这么大的电流。另外，航模电池本身比较暴力，多少输出其实无所谓，用多少算多少，大概率不是电池的问题。我的解决办法是换一个能够承受超过100A的12v稳压模块。期待下次的改进试水。
+## APM中Rover应用在洗舱机器人
+1. 用MP地面站烧录最新的Rover固件。注意烧录之前需要先断开连接。
+                
+                + 点击初始设置
+                + 选择机架         
+                + 选择硬件版本（这里使用的px4-2.4.8，版本为fmu3）
+                + 点击Upload Fireware（更新固件）
+                + 等待烧录完成
+![alt text](.assets_IMG/APM入门/image-62.png)
+2. 连接飞控并开始校准，这里我们转到QGC进行校准，因为MP地面站校准没有QGC校准方便，把所有的传感器都校准一遍。包括遥控器也都校准一遍。
+![alt text](.assets_IMG/APM入门/image-63.png)
+3. 电机设置，在下图中选择通道的功能。由于我使用了四个电机，没有舵机，这里1、3通道为左轮，2、4通道为右轮。设置后遥控器便可以油门控制电机速度，方向舵控制电机转向。这里全部都要勾选反向功能。
+![alt text](.assets_IMG/APM入门/image-64.png)
+4. 首次解锁可能会报错，去搜笔记中的记录。

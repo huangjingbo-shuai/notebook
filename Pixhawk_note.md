@@ -349,3 +349,7 @@ nano板的引脚图如下。红框中的为使用到的串口引脚。并注意�
 11. 那这个类里面又是什么呢？![alt text](.assets_IMG/Pixhawk_note/image-90.png)发现这里面的Outputupdate是一个虚函数，那我们就会推测mixer_module中的updateOutputs到底是不是PWMOut中的pdateOutputs呢？此时线索好像又断了。
 12. 那我们就要看是谁传进来的这个_interface就能确定。我们回到构造函数，mix_module的最上面![alt text](.assets_IMG/Pixhawk_note/image-91.png)，发现确实传了一个interface进来，而这个interface就是构造函数里面的interface![alt text](.assets_IMG/Pixhawk_note/image-92.png)
 13. 而这个interface又是这个写了虚函数的类里面的，此时我们想到一开始![alt text](.assets_IMG/Pixhawk_note/image-93.png)PWMOut是OutputModuleInterface的子类，他在MixingOutput这个类的构造函数里把自己传进去了，也就是说是PWMOut重写了接口类里面的Outputupdate函数。这样混合器里面就能已知更新PWM波的输出了。
+## PX4常见参数整理
+1. `CAUTION: Avionics Power low:4.66 Volt`这个是检测到了电池功率问题，这个应该是由于电池连接到固件的模块导致的，此消息意味着 Pixhawk 的 5V 电源电压降至某个阈值以下，可以更换转化的那个模块，差距不是很大的话也可以不解决，直接调整参数CBRK_SUPPLY，调整到最大![alt text](.assets_IMG/Pixhawk_note/image-95.png)
+2. `Power redundancy not met: 0 instead of 1`这个错误是在具有冗余电源检查导致的，如果在设备上只有一块电源，会出现这个问题，原因是因为PX4的电池检查是从0开始的，当数值是1时，说明有两块电源，可以改 COM_POWER_COUNT把1改为0。![alt text](.assets_IMG/Pixhawk_note/image-96.png)
+3. PX4启动流程：![alt text](.assets_IMG/Pixhawk_note/image-97.png)
