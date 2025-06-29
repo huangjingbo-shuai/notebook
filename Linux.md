@@ -1096,3 +1096,65 @@ eg:`ssh -X ldz@192.168.0.1`
 1. uname -a
 ## Ubuntu缺少字体问题解决
 1. 参考博客`https://blog.csdn.net/willingtolove/article/details/116423173`
+## 安装git
+1. `sudo apt-get install git`
+2. `git --version`
+# 在Jeston Nano上部署Yolov11
+## Jeston Nano上手
+1. 我拿到的新的Nano板子是商家事先刷好Ubuntu20.04版本的，现在说一下新板子怎么配置以快速上手
+2. 配置网络，固定Nano的IP地址，这里我设置为![alt text](.assets_IMG/Linux/image-125.png)，IP为33。子网掩码设置为“255.255.255.0”，网关设置为"192.168.1.1"。再找到网络设置里面的网络代理，设置网络代理为手动，如果不设置还是没法科学上网，因为找不到梯子的代理口，![alt text](.assets_IMG/Linux/image-126.png)。然后在`bashrc`里写入proxy，不然后后面用到黑窗口下载东西会出现下载不上的情况。![alt text](.assets_IMG/Linux/image-127.png)。从主电脑复制即可，注意，写完了以后记得`source ~/.bashrc`不然环境变量不会刷新。
+3. 安装Clash。现在自己电脑上下载"Clash.for.Windows-0.20.39-arm64-linux.tar.gz",这个压缩包在谷歌上很容易搜到，注意要下载arm64的，因为Nano板子是ARM架构的。解压到家目录下新创建的Clash文件夹，进去找到`cfw`，给这个附上可执行权限，然后通过`./cfw`可以执行。执行打开clash以后，从主电脑中scp一个节点到Clash文件夹，然后在clash中开启开机自启动，即可。
+4. 安装curl。`sudo apt update``sudo apt install curl -y`。安装完成以后就可以测试是否能科学上网。`curl -i google.com`，显示如图所示的画面即为能够科学上网。![alt text](.assets_IMG/Linux/image-128.png)
+# Jeston Nano配置yolov11环境
+## 安装 Jetpack
+Jetpack是专供英伟达的嵌入式计算平台使用的人工智能包。首先安装 jtop，这是一个监控 CPU，GPU 等使用情况的工具。`sudo pip install jetson-stats`然后安装 JetPack：`sudo apt install nvidia-jetpack`安装完 JetPack 后，命令行输入 jtop 并运行，即可看到当前电脑的 CPU 运行状态，按数字键可以切换页面，切换到 INFO 页面，可看到已经安装好的包：![alt text](.assets_IMG/Linux/image-129.png)```可以发现，当前你的 NX 已经安装好了很多难装的底层库：Cuda，cuDNN，TensorRT, OpenCV。这下可能你大致明白了咱们的定义：
+Jetpack 是英伟达提供的专门供他自己的嵌入式计算平台使用的人工智能包。
+Jetpack 把人工智能开发常用的底层驱动和库一股脑给你打包好，你安装了
+Jetpack，就把这几样东西都安装上去了。
+注意：上图 opencv 的版本后有“with CUDA NO”的字样，说明 opencv 也
+有支持 GPU 加速的版本，但是默认安装的 opencv 不支持 GPU 加速（pip 也只能
+安装 cpu 版本的 opencv）。由于作者的项目不涉及太多的 opencv 操作，配置 GPU
+版本的 opencv 对整体性能影响不大，所以作者没有深入研究，如果需要安装支
+持 GPU 加速的 opencv，需要将原 opencv 卸载，并通过源码编译安装，在 cmake
+阶段指定相应 cuda 配置，即可编译出支持 cuda 加速的 opencv。读者可自行百度
+解决。后文不会再提及 cuda，cudnn，opencv 的安装。```
+## cuda cudnn tensorrt配置
+1. cuda配置：添加cuda环境变量。打开~/.bashrc。`sudo vim ~/.bashrc`在文本末输入如下代码：```export LD_LIBRARY_PATH=/usr/local/cuda/lib64
+export PATH=$PATH:/usr/local/cuda/bin
+export CUDA_HOME=/usr/local/cuda```![alt text](.assets_IMG/Linux/image-130.png)
+2. 使新的环境变量或修改生效.`source ~/.bashrc`
+3. 验证，出现下图信息则成功配置。`nvcc -V`![alt text](.assets_IMG/Linux/image-131.png)
+4. cudnn配置。Jetpack中虽然安装了cuDNN，但没有将对应的头文件、库文件放到cuda目录。
+因此需要复制cudnn的头文件和库文件到cuda目录下`sudo cp /usr/include/cudnn*.h /usr/local/cuda/include`,`sudo cp /usr/lib/aarch64-linux-gnu/libcudnn* /usr/local/cuda/lib64`或者使用软链接替代：`sudo ln -s /usr/include/cudnn*.h /usr/local/cuda/include/`,`sudo ln -s /usr/lib/aarch64-linux-gnu/libcudnn* /usr/local/cuda/lib64/`
+## TensorRT Python环境配置
+1. TensorRT默认安装位置在/usr/lib/python3.8/dist-packages/中，若找不到trt， 则先执行以下命令，安装NVIDIA TensorRT 的 Python3绑定库`sudo apt install python3-libnvinfer`这样再进入上述路径后tensorrt就存在了。输入pip list后tensorrt也出现了。
+## Conda 虚拟Python环境中的TensorRT配置
+1. 若要在虚拟环境中使用tensorrt，由于tensorrt不能被虚拟环境pytorch中定位使用。因此我们需要软链接一下，运行如下命令：`sudo ln -s /usr/lib/python3.8/dist-packages/tensorrt* /home/nx/anaconda3/envs/pytorch/lib/python3.8/site-packages/`
+2. 测试一下，运行如下指令:`python -c "import tensorrt;print(tensorrt.__version__)"`若出现版本号8.5.2.2，则成功。
+## Miniconda安装与配置
+1. 下载Miniconda3。前往清华大学开源软件镜像站，选择次新aarch64版本Miniconda，下载到Jetson Downloads的目录`cd ~/Downloads`,`wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py39_24.9.2-0-Linux-aarch64.sh`
+2. 安装Miniconda3。`cd /home/nx/Downloads/`,`chmod +x Miniconda3-py39_24.9.2-0-Linux-aarch64.sh`,`./Miniconda3-py39_24.9.2-0-Linux-aarch64.sh	`安装完成Miniconda后，可以发现其修改了.bashrc文件。
+3. 创建环境。`conda create -n pytorch python=3.8`.`conda activate pytorch`。
+4. 注意，这里要打开`.bashrc`配置环境变量，让终端默认进入`pytorch`环境
+## PyTorch&Torchvision安装
+1. 安装PyTorch。安装依赖项`sudo apt install libopenblas-dev`
+2. 下载torch wheel安装包。前往`pytorch for Jeston`,`https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048`,下载所安装的jetpack版本支持的最高版本的torch wheel 安装包到Downloads目录下。
+3. `cd /Downloads`，`wget https://developer.download.nvidia.cn/compute/redist/jp/v512/pytorch/torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl`例如：jetpack5.1.x对应下图中红框的torch安装包，需注意Python 版本为 3.8。![alt text](.assets_IMG/Linux/image-132.png)
+4. 安装。`pip install torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl`
+5. 安装torchvisiion。安装依赖`pip install numpy requests Pillow`,`sudo apt install libjpeg-dev libpng-dev zlib1g-dev libpython3-dev libavcodec-dev libavformat-dev libswscale-dev`
+6. 编译安装torchvision。torchvision暂未发布直接能pip安装的whl版本，因此直接从源码编译。
+7. Torchvisiion版本选择。以torch2.1.0为例，对应的torchvisiion版本为0.16.x。版本对应关系为`https://github.com/pytorch/vision`
+8. 下载torchvisiion到Downloads目录下。网络ok的话，直接克隆到本地。`cd ./Downloads`，`git clone --branch v0.16.2 https://github.com/pytorch/vision`。网络不行clone慢的话，直接下载压缩包到PC，再上传jetson，解压即可。`unzip vision-0.16.2.zip`
+9. 编译安装torchvision。`cd vision`,`export BUILD_VERSION=0.16.2`,`python3 setup.py install --user`需要等待30min左右，出现以下提示则安装成功。![alt text](.assets_IMG/Linux/image-133.png)。安装成功后退出torchvision的安装目录再import torchvision进行验证，否则会出现以下warning
+## Ultralytics YOLOv11配置
+1. 下载YOLOv11 github项目。创建一个目录，用于存放YOLOv11的项目文件。`mkdir ~/Desktop/yolov11`,`cd ~/Desktop/yolov11`，同理，网络好的话可以直接克隆到文件夹，网络不好的话就下载压缩包再解压。
+2. 安装ultralytics包。采用可编辑模式安装`ultralytics`包：`pip install -e .`
+3. 验证ultralytics安装。把`ros_auv_ws`克隆到`Jeston Nano`上，重新编译并执行识别步骤。
+## 注意事项
+1. 编译的时候还是老样子，会报一系列的错误，最常见的就是`Yolov11`的`empy=3.3.4`这个包，一定要是这个版本，其他的版本就是会报错。
+2. 另外还有一个很重要的，就是环境变量，我在运行的时候发现，`Miniconda`对`ROS`的兼容不是很好，最常见的就是`/lib/aarch64-linux-gnu/libp11-kit.so.0: undefined symbol: ffi_type_pointer, version LIBFFI_BASE_7.0`,这是一个典型的 动态链接库冲突（libffi版本不兼容） 问题，尤其在 Jetson 上用 Conda 环境运行系统 ROS 程序时特别容易出现。![alt text](.assets_IMG/Linux/image-134.png)。这个问题非常有代表性，尤其是在你用 `Jetson Nano`（一种嵌入式 `ARM64` 系统）+ `Conda` + `ROS` 的组合时常常遇到 `ffi_type_pointer` 这类 `libffi` 动态链接错误，而在你自己的笔记本（通常是 `x86_64` + `Ubuntu` + `Anaconda` + `ROS`）上却不会。`Jetson Nano` 使用的是 `ARM64` 架构 + 自带 `NVIDIA` 定制的系统库，而 `Conda` 的很多库是为 `x86_64` 优化设计的。两者冲突后导致系统库和 `Conda` 库动态链接不兼容。
+3. 我的解决办法是`Nano`的`roscore`在大环境下运行，然后节点在`pytorch`环境里面运行，但是在运行之前要临时优先使用系统`libffi`，执行`export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libffi.so.7`，这样即可解决冲突问题。
+4. 另外，`mavros`也需要一个环境变量，这个环境变量应当要在最后，之前也碰到过类似问题，具体原因还不太清楚，我这里推荐的环境变量顺序如图所示。![alt text](.assets_IMG/Linux/image-135.png)
+5. `Jeston Nano`有加速推理的功能，但是这个地方的坑太多，我按照网上比较的官方的教程来配了，应该是对的，但是问题应该就出在我没有写好`yolo_trt.py`模块，是整套 `YOLO + TensorRT + ROS` 实时检测系统中的推理引擎封装模块。![alt text](.assets_IMG/Linux/image-136.png)
+6. 具体的`TensorRT`加速功能的配置参考`https://blog.csdn.net/python_yjys/category_12885034.html`的`8-10`节。
+7. 目前我测试的正常推理的帧率稳定在15-20帧，是完全可以用的，毕竟不是专门做视觉的，试了很久也没写出能用的加速封装模块，打算用来做日常推理，我认为是完全够用的。
