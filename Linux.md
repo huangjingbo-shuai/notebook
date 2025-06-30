@@ -1158,3 +1158,10 @@ export CUDA_HOME=/usr/local/cuda```![alt text](.assets_IMG/Linux/image-130.png)
 5. `Jeston Nano`有加速推理的功能，但是这个地方的坑太多，我按照网上比较的官方的教程来配了，应该是对的，但是问题应该就出在我没有写好`yolo_trt.py`模块，是整套 `YOLO + TensorRT + ROS` 实时检测系统中的推理引擎封装模块。![alt text](.assets_IMG/Linux/image-136.png)
 6. 具体的`TensorRT`加速功能的配置参考`https://blog.csdn.net/python_yjys/category_12885034.html`的`8-10`节。
 7. 目前我测试的正常推理的帧率稳定在15-20帧，是完全可以用的，毕竟不是专门做视觉的，试了很久也没写出能用的加速封装模块，打算用来做日常推理，我认为是完全够用的。
+## 其他问题配置
+1. 时间不对，差了16个小时，运行`sudo timedatectl set-ntp true`，`sudo timedatectl status`,查看是否开启`NTP`时间同步,我的`Nano`显示```Time zone: America/Los_Angeles (PDT, -0700)
+System clock synchronized: yes
+NTP service: active```,说明你 已经启用了网络时间同步（NTP），而且 系统时间也是同步的，问题出在时区设置，当前的时区是, 
+`America/Los_Angeles（太平洋时间，PDT）`所以你看到的时间是 北京时间 -16 小时。这会导致你误以为“时间不对”。
+2. 解决方案`sudo timedatectl set-timezone Asia/Shanghai`
+3. SSH远程开发`Nano`，具体办法参考赵虚左老师的ROS机器人笔记`http://www.autolabor.com.cn/book/ROSTutorials/di-9-zhang-ji-qi-ren-dao-822a28-shi-4f5329/92-vscodeyuan-cheng-kai-fa.html`第九章，不过我发现在第一次连接的时候需要下载`vscode远程开发工具`，第一次比较慢，耐心等待即可。

@@ -354,6 +354,3 @@ nano板的引脚图如下。红框中的为使用到的串口引脚。并注意�
 1. `CAUTION: Avionics Power low:4.66 Volt`这个是检测到了电池功率问题，这个应该是由于电池连接到固件的模块导致的，此消息意味着 Pixhawk 的 5V 电源电压降至某个阈值以下，可以更换转化的那个模块，差距不是很大的话也可以不解决，直接调整参数CBRK_SUPPLY，调整到最大![alt text](.assets_IMG/Pixhawk_note/image-95.png)
 2. `Power redundancy not met: 0 instead of 1`这个错误是在具有冗余电源检查导致的，如果在设备上只有一块电源，会出现这个问题，原因是因为PX4的电池检查是从0开始的，当数值是1时，说明有两块电源，可以改 COM_POWER_COUNT把1改为0。![alt text](.assets_IMG/Pixhawk_note/image-96.png)
 3. PX4启动流程：![alt text](.assets_IMG/Pixhawk_note/image-97.png)
-## 安装git
-1. `sudo apt-get install git`
-2. `git --version`
