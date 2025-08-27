@@ -41,6 +41,7 @@
    rm ${CONDA_PREFIX}/lib/libffi.7.so
    rm ${CONDA_PREFIX}/lib/libffi.so.7
    ```
+4. 在运行识别物体的ros时，一直报错少各种包，这个原因是没有在环境中编译，他可能需要一些包的依赖，需要在环境里面，然后生成一些东西放在`devel`里。解决办法就是只需要在环境里面编译就可以了。
 # 如何使用yolov11做训练和预测
 ## 前置步骤
 1. 安装NVIDIA显卡驱动

@@ -237,3 +237,30 @@ freebuoyancy_gazebo（模型插件） 模拟来自水的浮力和粘性力
 3. 电机设置，在下图中选择通道的功能。由于我使用了四个电机，没有舵机，这里1、3通道为左轮，2、4通道为右轮。设置后遥控器便可以油门控制电机速度，方向舵控制电机转向。这里全部都要勾选反向功能。
 ![alt text](.assets_IMG/APM入门/image-64.png)
 4. 首次解锁可能会报错，去搜笔记中的记录。
+## 关于APM固件使用麦克纳姆轮机架的教程
+1. 引言：为了做刘老师的麦克纳姆小车，一开始一直找不到合适的飞控固件，最开始做的是差速控制，后面为了拍视频用的是信号线插在接收机上，然后单独的控制四个轮，达到麦克纳姆轮的运动效果，但是这样一来就有很多不方便的地方，控制的时候，对角轮的速度不好控制，导致，左移或者右移的时候没办法等速的均匀移动，所以拍出来的效果不是很好。在这个地方我卡了大概一两个月，一直想找合适的固件，知道最近，我在一个论坛网站上，看到了有大佬询问关于`APM`使用麦克纳姆轮的请求，然后评论区有大哥回复得很好，也给出了具体的网站和教程。具体来说论坛的网站是`https://bbs.amovlab.com/forum.php?mod=viewthread&tid=27403`。![alt text](.assets_IMG/APM入门/image-65.png)![alt text](.assets_IMG/APM入门/image-66.png)
+2. 根据第一个大哥的回复，进入`APM`官网，`https://ardupilot.org/rover/docs/rover-motor-and-servo-configuration.html`，发现这里面就有各种机架的参数。
+3. 其中，需要的麦克纳姆机架就在`全能车辆`中。配置方法：
+                + MP地面站首先配置`1-4电机`为`motor`。然后 在`QGC`地面站上选择参数`FRAME_TYPE=1`，我们的麦克纳姆机架是`X`型，选择`2（OmniX）`
+4. 到这里，只要飞控此前已经通过校准等步骤，即可解锁，左手边控制的是前进后退和横移，右手把柄则是顺逆时针原地打转。
+## 关于自主控制的魔改方法
+1. `param set SYSID_MYGCS 255`正常模式，不接收外部RC输入
+2. `param set SYSID_MYGCS 1`,接收外部RC输入。
+3. `param set SERVO2_FUNCTION 51`，`param set SERVO2_FUNCTION 52`，`param set SERVO1_FUNCTION 33`,`param set SERVO2_FUNCTION 34`
+4. ```param set SYSID_MYGCS 255 && \
+param set SERVO1_FUNCTION 33 && \
+param set SERVO2_FUNCTION 34```
+5. ```param set SYSID_MYGCS 1 && \
+param set SERVO2_FUNCTION 52 && \
+param set SERVO1_FUNCTION 51```
+6. 解释：这里是帅师兄发现的方法，现在我直接在`MAVproxy`的黑窗口中发这些参数就可以实现，不需要在地面站繁琐的设置了。
+7. `rostopic pub -r 20 /mavros/rc/override mavros_msgs/OverrideRCIn "channels: [65535,65535,65535,65535,1600, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535]"`
+## ardupilot版本切换
+1. 现在github上克隆下来
+2. 首先查看当前版本`git describe --tags`，如果不匹配则保存或者丢弃`git reset --hard`
+3. 然后切换版本`git checkout ArduSub-4.1.2`
+4. 再查看版本`git describe --tags`
+## 针对飞控一直不断地因为电压不够无法进入`Ready To Fly`状态的解决办法
+1. `https://ardupilot.org/copter/docs/common-prearm-safety-checks.html`APM官网针对这个问题的解决办法是把参数`BRD_VBUS_MIN`降低，我这里降为4.0V问题解决，基本不会再报这个错误了。![alt text](.assets_IMG/APM入门/image-67.png)
+## 自定义机架
+1. 修改完文件后，还需要设置参数，因为机架不显示。

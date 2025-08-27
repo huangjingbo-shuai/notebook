@@ -1105,6 +1105,9 @@ eg:`ssh -X ldz@192.168.0.1`
 2. 配置网络，固定Nano的IP地址，这里我设置为![alt text](.assets_IMG/Linux/image-125.png)，IP为33。子网掩码设置为“255.255.255.0”，网关设置为"192.168.1.1"。再找到网络设置里面的网络代理，设置网络代理为手动，如果不设置还是没法科学上网，因为找不到梯子的代理口，![alt text](.assets_IMG/Linux/image-126.png)。然后在`bashrc`里写入proxy，不然后后面用到黑窗口下载东西会出现下载不上的情况。![alt text](.assets_IMG/Linux/image-127.png)。从主电脑复制即可，注意，写完了以后记得`source ~/.bashrc`不然环境变量不会刷新。
 3. 安装Clash。现在自己电脑上下载"Clash.for.Windows-0.20.39-arm64-linux.tar.gz",这个压缩包在谷歌上很容易搜到，注意要下载arm64的，因为Nano板子是ARM架构的。解压到家目录下新创建的Clash文件夹，进去找到`cfw`，给这个附上可执行权限，然后通过`./cfw`可以执行。执行打开clash以后，从主电脑中scp一个节点到Clash文件夹，然后在clash中开启开机自启动，即可。
 4. 安装curl。`sudo apt update``sudo apt install curl -y`。安装完成以后就可以测试是否能科学上网。`curl -i google.com`，显示如图所示的画面即为能够科学上网。![alt text](.assets_IMG/Linux/image-128.png)
+## 小车SLAM导航记录
+### 激光雷达的调试
+1. 激光雷达我用的是阿木实验室的`LDS-50C-3`
 # Jeston Nano配置yolov11环境
 ## 安装 Jetpack
 Jetpack是专供英伟达的嵌入式计算平台使用的人工智能包。首先安装 jtop，这是一个监控 CPU，GPU 等使用情况的工具。`sudo pip install jetson-stats`然后安装 JetPack：`sudo apt install nvidia-jetpack`安装完 JetPack 后，命令行输入 jtop 并运行，即可看到当前电脑的 CPU 运行状态，按数字键可以切换页面，切换到 INFO 页面，可看到已经安装好的包：![alt text](.assets_IMG/Linux/image-129.png)```可以发现，当前你的 NX 已经安装好了很多难装的底层库：Cuda，cuDNN，TensorRT, OpenCV。这下可能你大致明白了咱们的定义：
