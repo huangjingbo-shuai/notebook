@@ -1168,3 +1168,14 @@ NTP service: active```,说明你 已经启用了网络时间同步（NTP），�
 `America/Los_Angeles（太平洋时间，PDT）`所以你看到的时间是 北京时间 -16 小时。这会导致你误以为“时间不对”。
 2. 解决方案`sudo timedatectl set-timezone Asia/Shanghai`
 3. SSH远程开发`Nano`，具体办法参考赵虚左老师的ROS机器人笔记`http://www.autolabor.com.cn/book/ROSTutorials/di-9-zhang-ji-qi-ren-dao-822a28-shi-4f5329/92-vscodeyuan-cheng-kai-fa.html`第九章，不过我发现在第一次连接的时候需要下载`vscode远程开发工具`，第一次比较慢，耐心等待即可。
+## 如何将clash固定在收藏夹
+### 步骤
+1. `cd ~/.local/share/applications`，切换到目录文件夹，一般自己的应用全部放在这里面
+2. `vim clash.desktop`，在其中创建一个文件，其中的内容为
+```txt
+[Desktop Entry]
+Name=clash for windows
+Icon=/home/shuai/Pictures/clash.png
+Exec=/home/shuai/clash/cfw
+Type=Application
+```

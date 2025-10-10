@@ -264,3 +264,33 @@ param set SERVO1_FUNCTION 51```
 1. `https://ardupilot.org/copter/docs/common-prearm-safety-checks.html`APM官网针对这个问题的解决办法是把参数`BRD_VBUS_MIN`降低，我这里降为4.0V问题解决，基本不会再报这个错误了。![alt text](.assets_IMG/APM入门/image-67.png)
 ## 自定义机架
 1. 修改完文件后，还需要设置参数，因为机架不显示。
+## Sub编译一直过不了的解决办法
+1. 一开始一直报少包，其实是没少，只不过只有python3，但是固件中使用的是python2脚本，而现在python2已经没法装那些包了，所以传统命令行不通，具体为什么装不了还不得而知，之前我电脑原生的python2环境好像被我动过了，导致不太好用。
+2. 目前的解决办法是让默认的 python 指向 python3；或者修正脚本第一行，```sed -i '1s|#!/usr/bin/env python|#!/usr/bin/env python3|' /home/yunxia/ardupilot-ArduSub-4.1.2/Tools/scripts/make_intel_hex.py```,```head -1 /home/yunxia/ardupilot-ArduSub-4.1.2/Tools/scripts/make_intel_hex.py```
+## 关于ArduSub中从启动飞控到PWM控制逻辑的整理
+1. ![alt text](.assets_IMG/APM入门/image-69.png)
+
+        运行固件，这和是一个主循环函数，会持续以400hz频率运行。
+2. ![alt text](.assets_IMG/APM入门/image-70.png)
+        首先进`update_flight_mode`函数，这里更新飞行模式，从这里进入定深控制模式的主函数`althold_run`
+3. ![alt text](.assets_IMG/APM入门/image-71.png)
+        这里调用的了`control_depth`，再进去发现就在下面，进去后发现`pos_control.update_z_controller`，这是推力往下执行的关键。
+4. ![alt text](.assets_IMG/APM入门/image-72.png)
+        进去以后发现这个函数很多，但是关键的只有第`1012`行，这里是把计算出来的推力发给姿态控制器，让姿态控制器去落实，具体为什么是姿态控制器，具体原因不得而知，我猜测是，由于ROV的推进器很多，需要根据多个推进器的推力做矢量叠加，而这个过程中就涉及到了可能控制`Z`轴的推进器，所以干脆就放在一起控制，减少代码量，提高复用。
+5. ![alt text](.assets_IMG/APM入门/image-73.png)
+        进入`set_throttle_out`函数，发现进到了`AP_Motors_Class.h`里面，在`AP_Motors`的类中，这个函数在头文件里面就写完了。
+6. 这里是的`_motors`对象的成员函数，而`_motors`对象是`AC_AttitudeControl.h`中`AC_AttitudeControl`的一个对象，而这个对象是`AC_AttitudeControl`这个类对`AP_Motors`类对象的引用，传进来的是`motors`,经过初始化后`_motors`是`AP_Motors`类的别名，外部可用。![alt text](.assets_IMG/APM入门/image-74.png)而这里是在`protected`里面，所以我推测`AC_AttitudeControl`是`AC_AttitudeControl_Sub`的父类，结果确实如此。
+7. 所以，最后调用的是`AP_Motors`类的`set_throttle`函数，这个函数中储存的就是刚才深度控制计算出来的需要实施的推力值，至此，这一段走到头了。![alt text](.assets_IMG/APM入门/image-75.png)![alt text](.assets_IMG/APM入门/image-76.png)
+8. 回到![alt text](.assets_IMG/APM入门/image-77.png)，进入`motors_output()`
+9. ![alt text](.assets_IMG/APM入门/image-78.png)这里最关键的是`motor.output`
+10. 这里是`Sub`类下的函数，`motors_output()`，因为`motors`头文件包含了`Sub.h`而`Sub.h`中写了这个函数，但是在`Sub.h`没有具体实现，而是在`motor.cpp`中具体实现的。![alt text](.assets_IMG/APM入门/image-79.png)![alt text](.assets_IMG/APM入门/image-80.png)
+11. ![alt text](.assets_IMG/APM入门/image-81.png)![alt text](.assets_IMG/APM入门/image-82.png)，但为什么这个`output`来源这么奇怪呢？
+12. 首先进入`motors`![alt text](.assets_IMG/APM入门/image-83.png)发现这里是`AP_Motors6DOF`类实例化的`motors`对象，但是进入`AP_Motors6DOF`类中并没有`output`这个函数，然后直接点进`output`函数中，发现进到了`AP_MotorsMulticopter`中，这就是为什么第二个图显示的来源是`AP_MotorsMulticopter`，那么是怎么调用的呢。
+13. 我猜测大概率可能是继承的函数，再回到`AP_Motors6DOF`中，进入他继承的`AP_MotorsMatrix`，进去以后发现`AP_MotorsMatrix`也没有，再进入`AP_MotorsMatrix`继承的`AP_MotorsMulticopter`,原因就慢慢出来了，![alt text](.assets_IMG/APM入门/image-84.png)，发现`output`函数是一个虚函数。在`motors.cpp`中重写了
+14. ![alt text](.assets_IMG/APM入门/image-85.png)然后进入`output()`,可以看出里面和转换`PWM`波相关的是`output_to_motors`
+15. 进入发现有好多复用这个函数，我们用的是普通的自定义ROV机架，应该进`AP_Motors6DOF`中的。![alt text](.assets_IMG/APM入门/image-86.png)发现`calc_thrust_to_pwm`是计算PWM波的函数。![alt text](.assets_IMG/APM入门/image-87.png)
+16. 但是发现这个函数的输入是`_thrust_rpyt_out`这样一个数组，猜测有可能是上一步`set_throttle_out`函数计算的`throttle_in`还经过某种计算再得到的。
+17. 搜索文件中的`_thrust_rpyt_out`,发现有好几个，由于我们使用的是自定义机架，所以应该是![alt text](.assets_IMG/APM入门/image-88.png)
+18. ![alt text](.assets_IMG/APM入门/image-89.png)观察，寻找推力相关的变量，`linear_out`到`throttle_thrust`到`get_throttle_bidirectional()`，发现这个推理确实是经过函数计算得到的，再找是谁作为这个函数的输入的，进入函数，发现这里用到的是`_throttle_filter`。然后到这里就找不到输入了。
+19. 可能是外部通过类的其他方法预先传入，然后左侧搜索`_throttle_filter`,找到`AP_MotorsMulticopter`下的`update_throttle_filter`函数，发现上一步中`set_throttle`计算得到的`_throttle_in`在这里用上了，也就是说这里还经过了一次滤波转换。那为什么`AP_Motors`类可以直接用`AP_MotorsMulticopter`的`_throttle_filter`，因为他们这几个文件都在同一个文件夹下。![alt text](.assets_IMG/APM入门/image-90.png)
+20. 再回到`AP_Motors6DOF.cpp`的`output_to_motors()`，进去`calc_thrust_to_pwm`，就能看到，最终PWM波是怎么输出的了。![alt text](.assets_IMG/APM入门/image-91.png)
